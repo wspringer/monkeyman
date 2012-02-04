@@ -12,8 +12,10 @@ class ScalateToHtmlDecorator(engine: TemplateEngine) extends ResourceDecorator {
     case res @ FileSystemResource(_, _) =>
       val source = new FileTemplateSource(res.file, resource.path)
       allCatch.opt(engine.load(source))
-        .map(new ScalateToHtmlDecoration(resource, _, engine))
-        .getOrElse(resource)
+        .map {
+          template =>
+            new ScalateToHtmlDecoration(resource, template, engine)
+        }.getOrElse(resource)
     case _ => resource
   } 
   

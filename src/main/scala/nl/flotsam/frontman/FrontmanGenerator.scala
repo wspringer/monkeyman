@@ -30,12 +30,20 @@ object FrontmanGenerator {
       else new File(name)
   }
   
-  
+  private val layoutDir = parser.option[File](List("t", "layout"), "DIR",
+    "The directory for storing the layout pages. (Defaults to 'layout' directory.") {
+    (name, opt) =>
+      if (name.startsWith("~")) new File(System.getProperty("user.home") + name.substring(1))
+      else new File(name)
+  }
+
   def main(args: Array[String]) {
     try {
       parser.parse(args)
-      val dir = sourceDir.value.getOrElse(new File("source"))
-      val config = new FrontmanConfiguration(dir)
+      val config = new FrontmanConfiguration(
+        sourceDir = sourceDir.value.getOrElse(new File("source")),
+        layoutDir = layoutDir.value.getOrElse(new File("layout"))
+      )
       if (help.value == Some(true))
         println(parser.usageString(None))
       else if (list.value == Some(true)) 
