@@ -5,12 +5,12 @@ import java.io.{PrintWriter, StringWriter}
 import org.apache.commons.io.IOUtils
 import nl.flotsam.frontman.Resource
 import org.fusesource.scalate.{Template, DefaultRenderContext, TemplateEngine}
+import org.apache.commons.io.FilenameUtils._
 
 class ScalateToHtmlDecoration(resource: Resource, template: Template, engine: TemplateEngine)
   extends ResourceDecoration(resource)
 {
-
-  override val path = resource.path.replace("." + template.source.templateType, ".html")
+  override val path = removeExtension(resource.path) + ".html"
 
   override def contentType = "text/html"
 
