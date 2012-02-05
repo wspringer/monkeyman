@@ -10,7 +10,7 @@ import nl.flotsam.frontman.decorator.ResourceDecoration
 /**
  * Mimics YAML front matter extraction. Not really YAML, but who cares?
  */
-class YamlFrontmatterExtractingDecorator(resource: Resource) extends ResourceDecoration(resource) {
+class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(resource) {
 
   type AttributeSet = Map[String, String]
   
@@ -23,25 +23,36 @@ class YamlFrontmatterExtractingDecorator(resource: Resource) extends ResourceDec
     }
   }
 
-  override def label =
-    attributes.get("title").orElse(resource.label)
+  override def title = {
+    val title = attributes.get("title")
+    title.orElse(resource.title)
+  }
 
   override def tags = 
     resource.tags ++ attributes.get("tags").map(_.split(",")).getOrElse(Array.empty)
 
+  override def open = {
+    if (content.isDefined) IOUtils.toInputStream(content.get, "UTF-8")
+    else resource.open
+  }
+
   private def extractAttributes(str: String): (Map[String, String], Option[String]) = {
-    val lines = str.lines.toStream
+    val lines = str.lines.toList
     lines.headOption match {
       case Some(line) if line.trim == "---" =>
-        val (settings, remainder) = lines.span(_ != "---")
+        val (settings, remainder) = lines.tail.span(_ != "---")
         val attributes = (for {
           setting <- settings
           (key, value) = setting.span(_ != ':')
-        } yield (key.trim, value.tail.trim)).toMap
+        } yield {
+          (key.trim, value.tail.trim)
+        }).toMap
         (attributes, Some(remainder.tail.mkString("\n")))
       case _ =>
         (Map.empty, None)
     }
   }
 
+  override def toString = this.getClass.getName + "(" + resource.toString + ")"
+  
 }

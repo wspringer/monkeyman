@@ -12,7 +12,7 @@ import org.pegdown.{LinkRenderer, ToHtmlSerializer, PegDownProcessor}
 case class MarkdownToHtmlDecoration(resource: Resource, template: Option[Template], engine: TemplateEngine)
   extends ResourceDecoration(resource) {
 
-  lazy val (title, html) = {
+  lazy val (extractedTitle, html) = {
     using(resource.open) {
       in =>
         val markdown = IOUtils.toString(in, "UTF-8")
@@ -25,7 +25,7 @@ case class MarkdownToHtmlDecoration(resource: Resource, template: Option[Templat
     }
   }
 
-  override def label = title.orElse(resource.label)
+  override def title = resource.title.orElse(extractedTitle)
 
   override val contentType =
     if (template.isDefined) "text/html"

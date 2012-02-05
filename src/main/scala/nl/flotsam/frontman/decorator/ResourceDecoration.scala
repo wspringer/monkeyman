@@ -4,7 +4,7 @@ import nl.flotsam.frontman.Resource
 
 class ResourceDecoration(resource: Resource) extends Resource {
 
-  def label = resource.label
+  def title = resource.title
 
   def pubDate = resource.pubDate
 

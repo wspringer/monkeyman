@@ -9,7 +9,7 @@ trait Resource {
   /**
    * A human readable String to refer to this file. Can contain spaces.
    */
-  def label: Option[String]
+  def title: Option[String]
 
   /**
    * The date from which on this file should be considered published. (Note: that doesn't mean it will stay there forever, it just allows you to hold off publication if you don't want to and have a publication date if that's what you want to display.

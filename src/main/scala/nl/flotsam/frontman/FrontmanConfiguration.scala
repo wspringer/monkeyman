@@ -2,6 +2,8 @@ package nl.flotsam.frontman
 
 import decorator.haml.ScalateToHtmlDecorator
 import decorator.markdown.MarkdownToHtmlDecorator
+import decorator.permalink.PermalinkDecorator
+import decorator.yaml.YamlFrontmatterDecorator
 import java.io.File
 import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Template, TemplateEngine}
@@ -22,8 +24,10 @@ class FrontmanConfiguration(sourceDir: File, layoutDir: File) {
   }
   
   val resourceLoader = new DecoratingResourceLoader(fileSystemResourceLoader,
+    new YamlFrontmatterDecorator(),
     new MarkdownToHtmlDecorator(templateEngine, layoutResolver),
-    new ScalateToHtmlDecorator(templateEngine)
+    new ScalateToHtmlDecorator(templateEngine),
+    PermalinkDecorator
   )
   
   private def tryLoadTemplate(dir: File): Option[Template] = {

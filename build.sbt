@@ -16,7 +16,8 @@ libraryDependencies ++= Seq(
   "commons-io" % "commons-io" % "2.1",
   "org.joda" % "joda-convert" % "1.2",
   "org.fusesource.scalate" % "scalate-core" % "1.5.2-scala_2.8.1",
-  "org.clapper" %% "argot" % "0.3.3"
+  "org.clapper" %% "argot" % "0.3.3",
+  "com.ibm.icu" % "icu4j" % "4.8.1.1"
 )
 
 resolvers ++= Seq(

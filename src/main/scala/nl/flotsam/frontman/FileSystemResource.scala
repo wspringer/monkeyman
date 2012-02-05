@@ -10,7 +10,7 @@ case class FileSystemResource(baseDir: File, path: String) extends Resource {
 
   lazy val file = new File(baseDir, path)
 
-  lazy val label = Some(file.getName)
+  lazy val title = None
 
   lazy val pubDate = Some(new LocalDate(file.lastModified()))
 
