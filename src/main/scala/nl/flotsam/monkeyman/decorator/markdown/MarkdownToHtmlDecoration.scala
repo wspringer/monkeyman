@@ -9,7 +9,7 @@ import java.io.{PrintWriter, StringWriter}
 import org.pegdown.ast.{TextNode, HeaderNode}
 import org.pegdown.{LinkRenderer, ToHtmlSerializer, PegDownProcessor}
 
-case class MarkdownToHtmlDecoration(resource: Resource, template: Option[Template], engine: TemplateEngine)
+case class MarkdownToHtmlDecoration(resource: Resource, template: Option[Template], engine: TemplateEngine, allResources: () => Seq[Resource])
   extends ResourceDecoration(resource) {
 
   lazy val (extractedTitle, html) = {
@@ -41,6 +41,7 @@ case class MarkdownToHtmlDecoration(resource: Resource, template: Option[Templat
       val context = new DefaultRenderContext(path, engine, new PrintWriter(writer))
       context.attributes("body") = html
       context.attributes("title") = title
+      context.attributes("allResources") = allResources()
       template.get.render(context)
       IOUtils.toInputStream(writer.getBuffer, "UTF-8")
     } else {

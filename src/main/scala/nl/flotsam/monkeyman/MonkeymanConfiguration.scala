@@ -3,10 +3,11 @@ package nl.flotsam.monkeyman
 import decorator.haml.ScalateToHtmlDecorator
 import decorator.markdown.MarkdownToHtmlDecorator
 import decorator.permalink.PermalinkDecorator
+import decorator.registry.RegistryDecorator
 import decorator.yaml.YamlFrontmatterDecorator
 import java.io.File
 import org.apache.commons.io.FilenameUtils._
-import org.fusesource.scalate.{Template, TemplateEngine}
+import org.fusesource.scalate.{Binding, Template, TemplateEngine}
 
 class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
@@ -22,12 +23,21 @@ class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
     def resolve(path: String) =
       tryLoadTemplate(new File(layoutDir, getPath(path)))
   }
+
+  val registryDecorator = new RegistryDecorator
+  templateEngine.bindings = new Binding(
+    name = "allResources",
+    className = "Seq[nl.flotsam.monkeyman.Resource]",
+    defaultValue = Some("Seq.empty[nl.flotsam.monkeyman.Resource]")
+  ) :: templateEngine.bindings
+
   
   val resourceLoader = new DecoratingResourceLoader(fileSystemResourceLoader,
     new YamlFrontmatterDecorator(),
-    new MarkdownToHtmlDecorator(templateEngine, layoutResolver),
-    new ScalateToHtmlDecorator(templateEngine),
-    PermalinkDecorator
+    new MarkdownToHtmlDecorator(templateEngine, layoutResolver, registryDecorator.allResources _),
+    new ScalateToHtmlDecorator(templateEngine, registryDecorator.allResources _),
+    PermalinkDecorator,
+    registryDecorator
   )
   
   private def tryLoadTemplate(dir: File): Option[Template] = {

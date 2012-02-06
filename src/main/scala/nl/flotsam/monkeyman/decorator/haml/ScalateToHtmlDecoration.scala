@@ -7,7 +7,7 @@ import nl.flotsam.monkeyman.Resource
 import org.fusesource.scalate.{Template, DefaultRenderContext, TemplateEngine}
 import org.apache.commons.io.FilenameUtils._
 
-class ScalateToHtmlDecoration(resource: Resource, template: Template, engine: TemplateEngine)
+class ScalateToHtmlDecoration(resource: Resource, template: Template, engine: TemplateEngine, allResources: () => Seq[Resource])
   extends ResourceDecoration(resource)
 {
   override val path = removeExtension(resource.path) + ".html"
@@ -17,6 +17,7 @@ class ScalateToHtmlDecoration(resource: Resource, template: Template, engine: Te
   override def open = {
     val writer = new StringWriter
     val context = new DefaultRenderContext(path, engine, new PrintWriter(writer))
+    context.attributes("allResources") = allResources()
     template.render(context)
     IOUtils.toInputStream(writer.toString)
   }
