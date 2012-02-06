@@ -28,3 +28,4 @@ resolvers ++= Seq(
 
 initialCommands in console := "import java.io._; import nl.flotsam.frontman._"
 
+mainClass in (Compile, run) := Some("nl.flotsam.frontman.Frontman")

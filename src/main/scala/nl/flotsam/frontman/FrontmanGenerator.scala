@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils
 
 object FrontmanGenerator {
 
-  private val parser = new ArgotParser("frontman-gen")
+  private val parser = new ArgotParser("frontman generate")
   
   private val list = parser.flag("l", true, "Only list the pages found.")
   
