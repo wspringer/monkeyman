@@ -1,4 +1,4 @@
-name := "frontman"
+name := "monkeyman"
 
 version := "0.1"
 
