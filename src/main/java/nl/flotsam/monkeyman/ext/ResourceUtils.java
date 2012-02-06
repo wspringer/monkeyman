@@ -1,4 +1,4 @@
-package nl.flotsam.frontman.ext;
+package nl.flotsam.monkeyman.ext;
 
 import org.apache.commons.io.FilenameUtils;
 

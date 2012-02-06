@@ -1,6 +1,6 @@
-package nl.flotsam.frontman.decorator.permalink
+package nl.flotsam.monkeyman.decorator.permalink
 
-import nl.flotsam.frontman.{Resource, ResourceDecorator}
+import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
 
 
 object PermalinkDecorator extends ResourceDecorator {

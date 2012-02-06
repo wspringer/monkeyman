@@ -1,8 +1,8 @@
-package nl.flotsam.frontman.decorator.haml
+package nl.flotsam.monkeyman.decorator.haml
 
 import org.fusesource.scalate.TemplateEngine
 import org.fusesource.scalate.support.FileTemplateSource
-import nl.flotsam.frontman.{FileSystemResource, Resource, ResourceDecorator}
+import nl.flotsam.monkeyman.{FileSystemResource, Resource, ResourceDecorator}
 import scala.util.control.Exception._
 
 

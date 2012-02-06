@@ -1,9 +1,9 @@
-package nl.flotsam.frontman.decorator.haml
+package nl.flotsam.monkeyman.decorator.haml
 
-import nl.flotsam.frontman.decorator.ResourceDecoration
+import nl.flotsam.monkeyman.decorator.ResourceDecoration
 import java.io.{PrintWriter, StringWriter}
 import org.apache.commons.io.IOUtils
-import nl.flotsam.frontman.Resource
+import nl.flotsam.monkeyman.Resource
 import org.fusesource.scalate.{Template, DefaultRenderContext, TemplateEngine}
 import org.apache.commons.io.FilenameUtils._
 

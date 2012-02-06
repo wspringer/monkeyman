@@ -1,8 +1,8 @@
-package nl.flotsam.frontman.decorator.markdown
+package nl.flotsam.monkeyman.decorator.markdown
 
-import nl.flotsam.frontman.Resource
-import nl.flotsam.frontman.decorator.ResourceDecoration
-import nl.flotsam.frontman.util.Closeables._
+import nl.flotsam.monkeyman.Resource
+import nl.flotsam.monkeyman.decorator.ResourceDecoration
+import nl.flotsam.monkeyman.util.Closeables._
 import org.fusesource.scalate.{DefaultRenderContext, TemplateEngine, Template}
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import java.io.{PrintWriter, StringWriter}

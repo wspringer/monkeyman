@@ -1,7 +1,7 @@
-package nl.flotsam.frontman.decorator.markdown
+package nl.flotsam.monkeyman.decorator.markdown
 
 import org.fusesource.scalate.TemplateEngine
-import nl.flotsam.frontman.{LayoutResolver, Resource, ResourceDecorator}
+import nl.flotsam.monkeyman.{LayoutResolver, Resource, ResourceDecorator}
 
 class MarkdownToHtmlDecorator(engine: TemplateEngine, layoutResolver: LayoutResolver) extends ResourceDecorator {
   

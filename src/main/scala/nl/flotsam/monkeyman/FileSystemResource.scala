@@ -1,4 +1,4 @@
-package nl.flotsam.frontman
+package nl.flotsam.monkeyman
 
 import org.joda.time.LocalDate
 import java.io.{FileInputStream, File}

@@ -1,7 +1,7 @@
-package nl.flotsam.frontman.decorator.permalink
+package nl.flotsam.monkeyman.decorator.permalink
 
-import nl.flotsam.frontman.decorator.ResourceDecoration
-import nl.flotsam.frontman.Resource
+import nl.flotsam.monkeyman.decorator.ResourceDecoration
+import nl.flotsam.monkeyman.Resource
 import com.ibm.icu.text.Transliterator
 import org.apache.commons.io.FilenameUtils._
 import annotation.tailrec

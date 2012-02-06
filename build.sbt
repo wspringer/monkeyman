@@ -26,6 +26,6 @@ resolvers ++= Seq(
   "releases"  at "http://scala-tools.org/repo-releases"
 )
 
-initialCommands in console := "import java.io._; import nl.flotsam.frontman._"
+initialCommands in console := "import java.io._; import nl.flotsam.monkeyman._"
 
-mainClass in (Compile, run) := Some("nl.flotsam.frontman.Frontman")
+mainClass in (Compile, run) := Some("nl.flotsam.monkeyman.Monkeyman")

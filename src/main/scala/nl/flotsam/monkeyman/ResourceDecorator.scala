@@ -1,4 +1,4 @@
-package nl.flotsam.frontman
+package nl.flotsam.monkeyman
 
 trait ResourceDecorator {
 

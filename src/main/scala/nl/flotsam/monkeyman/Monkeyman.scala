@@ -1,9 +1,9 @@
-package nl.flotsam.frontman
+package nl.flotsam.monkeyman
 
-object Frontman {
+object Monkeyman {
 
   val tools = Map(
-    "generate" -> FrontmanGenerator
+    "generate" -> MonkeymanGenerator
   )
 
   def main(args: Array[String]) {
@@ -21,10 +21,10 @@ object Frontman {
     println("Usage:")
     println()
     for (key <- tools.keys) {
-      println("frontman " + key + " ARGS")
+      println("monkeyman " + key + " ARGS")
     }
     println()
-    println("Type 'frontman TOOL [-h|--help]' for more information.")
+    println("Type 'monkeyman TOOL [-h|--help]' for more information.")
     println()
   }
 

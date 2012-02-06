@@ -1,4 +1,4 @@
-package nl.flotsam.frontman
+package nl.flotsam.monkeyman
 
 class DecoratingResourceLoader(loader: ResourceLoader, decorators: ResourceDecorator*) extends ResourceLoader {
 

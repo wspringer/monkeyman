@@ -1,4 +1,4 @@
-package nl.flotsam.frontman
+package nl.flotsam.monkeyman
 
 import org.clapper.argot.{ArgotUsageException, ArgotParser}
 import org.clapper.argot.ArgotConverters._
@@ -8,9 +8,9 @@ import Closeables._
 import org.apache.commons.io.FileUtils
 
 
-object FrontmanGenerator {
+object MonkeymanGenerator {
 
-  private val parser = new ArgotParser("frontman generate")
+  private val parser = new ArgotParser("monkeyman generate")
   
   private val list = parser.flag("l", true, "Only list the pages found.")
   
@@ -40,7 +40,7 @@ object FrontmanGenerator {
   def main(args: Array[String]) {
     try {
       parser.parse(args)
-      val config = new FrontmanConfiguration(
+      val config = new MonkeymanConfiguration(
         sourceDir = sourceDir.value.getOrElse(new File("source")),
         layoutDir = layoutDir.value.getOrElse(new File("layout"))
       )
@@ -60,7 +60,7 @@ object FrontmanGenerator {
     }
   }
   
-  private def generate(config: FrontmanConfiguration, targetDir: File) {
+  private def generate(config: MonkeymanConfiguration, targetDir: File) {
     targetDir.mkdirs()
     for (resource <- config.resourceLoader.load) {
       val targetFile = new File(targetDir, resource.path)

@@ -1,10 +1,10 @@
-package nl.flotsam.frontman
+package nl.flotsam.monkeyman
 
-import ext.ResourceUtils
 import java.io.File
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.TrueFileFilter
 import collection.JavaConversions._
+import nl.flotsam.monkeyman.ext.ResourceUtils
 
 class FileSystemResourceLoader(baseDir: File) extends ResourceLoader {
 

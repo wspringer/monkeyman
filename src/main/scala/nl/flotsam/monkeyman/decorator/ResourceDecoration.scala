@@ -1,6 +1,6 @@
-package nl.flotsam.frontman.decorator
+package nl.flotsam.monkeyman.decorator
 
-import nl.flotsam.frontman.Resource
+import nl.flotsam.monkeyman.Resource
 
 class ResourceDecoration(resource: Resource) extends Resource {
 

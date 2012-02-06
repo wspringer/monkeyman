@@ -1,4 +1,4 @@
-package nl.flotsam.frontman.util
+package nl.flotsam.monkeyman.util
 
 object Closeables {
 

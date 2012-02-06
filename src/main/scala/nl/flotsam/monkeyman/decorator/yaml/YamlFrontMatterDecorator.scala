@@ -1,6 +1,6 @@
-package nl.flotsam.frontman.decorator.yaml
+package nl.flotsam.monkeyman.decorator.yaml
 
-import nl.flotsam.frontman.{Resource, ResourceDecorator}
+import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
 
 
 class YamlFrontmatterDecorator(included: (Resource) => Boolean = { _.path.endsWith(".md") }) extends ResourceDecorator {

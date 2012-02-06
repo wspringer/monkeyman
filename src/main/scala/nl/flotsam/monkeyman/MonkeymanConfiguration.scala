@@ -1,4 +1,4 @@
-package nl.flotsam.frontman
+package nl.flotsam.monkeyman
 
 import decorator.haml.ScalateToHtmlDecorator
 import decorator.markdown.MarkdownToHtmlDecorator
@@ -8,7 +8,7 @@ import java.io.File
 import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Template, TemplateEngine}
 
-class FrontmanConfiguration(sourceDir: File, layoutDir: File) {
+class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
   private val layoutFileName = "layout"
   

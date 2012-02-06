@@ -1,11 +1,11 @@
-package nl.flotsam.frontman.decorator.yaml
+package nl.flotsam.monkeyman.decorator.yaml
 
-import nl.flotsam.frontman.Resource
-import nl.flotsam.frontman.util.Closeables._
+import nl.flotsam.monkeyman.Resource
+import nl.flotsam.monkeyman.util.Closeables._
 import scala.util.control.Exception._
 import org.apache.commons.io.IOUtils
 import collection.JavaConversions._
-import nl.flotsam.frontman.decorator.ResourceDecoration
+import nl.flotsam.monkeyman.decorator.ResourceDecoration
 
 /**
  * Mimics YAML front matter extraction. Not really YAML, but who cares?
