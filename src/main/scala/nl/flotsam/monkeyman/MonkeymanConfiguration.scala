@@ -19,10 +19,10 @@
 
 package nl.flotsam.monkeyman
 
-import decorator.haml.ScalateToHtmlDecorator
-import decorator.markdown.MarkdownToHtmlDecorator
+import decorator.markdown.MarkdownDecorator
 import decorator.permalink.PermalinkDecorator
 import decorator.registry.RegistryDecorator
+import decorator.scalate.ScalateDecorator
 import decorator.snippet.SnippetDecorator
 import decorator.yaml.YamlFrontmatterDecorator
 import java.io.File
@@ -54,9 +54,9 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
   
   val resourceLoader = new DecoratingResourceLoader(fileSystemResourceLoader,
     new YamlFrontmatterDecorator(),
-    new MarkdownToHtmlDecorator(),
+    new MarkdownDecorator(),
     new SnippetDecorator(layoutResolver, templateEngine, registryDecorator.allResources _),
-    new ScalateToHtmlDecorator(templateEngine, registryDecorator.allResources _),
+    new ScalateDecorator(templateEngine, registryDecorator.allResources _),
     PermalinkDecorator,
     registryDecorator
   )

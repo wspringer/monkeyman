@@ -26,7 +26,7 @@ import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.pegdown.ast.{TextNode, HeaderNode}
 import org.pegdown.{LinkRenderer, ToHtmlSerializer, PegDownProcessor}
 
-case class MarkdownToHtmlDecoration(resource: Resource)
+case class MarkdownDecoration(resource: Resource)
   extends ResourceDecoration(resource) {
 
   lazy val (extractedTitle, html) = {

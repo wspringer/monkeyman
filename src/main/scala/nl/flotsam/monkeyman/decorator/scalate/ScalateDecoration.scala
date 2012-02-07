@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman.decorator.haml
+package nl.flotsam.monkeyman.decorator.scalate
 
 import nl.flotsam.monkeyman.decorator.ResourceDecoration
 import java.io.{PrintWriter, StringWriter}
@@ -26,7 +26,7 @@ import nl.flotsam.monkeyman.Resource
 import org.fusesource.scalate.{Template, DefaultRenderContext, TemplateEngine}
 import org.apache.commons.io.FilenameUtils._
 
-class ScalateToHtmlDecoration(resource: Resource, template: Template, engine: TemplateEngine, allResources: () => Seq[Resource])
+class ScalateDecoration(resource: Resource, template: Template, engine: TemplateEngine, allResources: () => Seq[Resource])
   extends ResourceDecoration(resource)
 {
   override val path = removeExtension(resource.path) + ".html"
