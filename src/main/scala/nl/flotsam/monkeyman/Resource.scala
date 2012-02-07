@@ -60,4 +60,9 @@ trait Resource {
    */
   def published: Boolean
 
+  /**
+   * Get an HTML fragment to be inlcuded somewhere else.
+   */
+  def asHtmlFragment: Option[String]
+
 }

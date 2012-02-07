@@ -50,6 +50,8 @@ case class MarkdownToHtmlDecoration(resource: Resource)
 
   override def open = IOUtils.toInputStream(html)
 
+  override def asHtmlFragment = Some(html)
+
   trait TitleExtractor extends ToHtmlSerializer {
     var inheader = false
     var title: Option[String] = None
