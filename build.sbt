@@ -1,3 +1,5 @@
+import AssemblyKeys._
+
 name := "monkeyman"
 
 version := "0.1"
@@ -30,4 +32,9 @@ mainClass in (Compile, packageBin) := Some("nl.flotsam.monkeyman.Monkeyman")
 
 seq(ProguardPlugin.proguardSettings :_*)
 
-proguardOptions += keepMain("nl.flotsam.monkeyman.Monkeyman")
+proguardOptions ++= List(keepMain("nl.flotsam.monkeyman.Monkeyman"), "-keepclasseswithmembers class org.pegdown.**", "-keepclasseswithmembers class org.parboiled.**")
+
+seq(assemblySettings: _*)
+
+mainClass in assembly := Some("nl.flotsam.monkeyman.Monkeyman")
+

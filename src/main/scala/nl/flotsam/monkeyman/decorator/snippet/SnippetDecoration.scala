@@ -41,6 +41,7 @@ class SnippetDecoration(resource: Resource, template: Template, engine: Template
         val context = new DefaultRenderContext(path, engine, new PrintWriter(writer))
         context.attributes("body") = IOUtils.toString(in, "UTF-8")
         context.attributes("title") = title
+        context.attributes("tags") = tags
         context.attributes("allResources") = allResources()
         template.render(context)
         IOUtils.toInputStream(writer.getBuffer, "UTF-8")

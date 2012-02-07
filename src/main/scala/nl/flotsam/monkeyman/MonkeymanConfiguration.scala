@@ -49,6 +49,18 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
     name = "allResources",
     className = "Seq[nl.flotsam.monkeyman.Resource]",
     defaultValue = Some("Seq.empty[nl.flotsam.monkeyman.Resource]")
+  ) :: new Binding(
+    name = "title",
+    className = "Option[String]",
+    defaultValue = Some("None")
+  ) :: new Binding(
+    name = "body",
+    className = "String",
+    defaultValue = Some(""""No body"""")
+  ) :: new Binding(
+    name = "tags",
+    className = "Set[String]",
+    defaultValue = Some("Set.empty[String]")
   ) :: templateEngine.bindings
 
 

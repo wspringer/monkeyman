@@ -49,7 +49,7 @@ class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(r
   override def published = attributes.get("published").flatMap(str => allCatch.opt(str.toBoolean)).getOrElse(resource.published)
 
   override def tags = 
-    resource.tags ++ attributes.get("tags").map(_.split(",")).getOrElse(Array.empty)
+    resource.tags ++ attributes.get("tags").map(_.split(",").map(_.trim)).getOrElse(Array.empty)
 
   override def open = {
     if (content.isDefined) IOUtils.toInputStream(content.get, "UTF-8")
