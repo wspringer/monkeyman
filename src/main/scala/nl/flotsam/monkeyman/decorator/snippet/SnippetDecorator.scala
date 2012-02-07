@@ -17,16 +17,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman.decorator.markdown
+package nl.flotsam.monkeyman.decorator.snippet
 
-import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
+import org.fusesource.scalate.TemplateEngine
+import nl.flotsam.monkeyman.{LayoutResolver, Resource, ResourceDecorator}
 
-class MarkdownToHtmlDecorator extends ResourceDecorator {
-  
-  def decorate(resource: Resource) = {
-    if (resource.contentType == "text/x-web-markdown" || resource.path.endsWith(".md"))
-      new MarkdownToHtmlDecoration(resource)
+
+class SnippetDecorator(layoutResolver: LayoutResolver, engine: TemplateEngine, allResources: () => Seq[Resource])
+  extends ResourceDecorator
+{
+
+  def decorate(resource: Resource) =
+    if (resource.contentType == "text/x-html-fragment")
+      layoutResolver.resolve(resource.path) match {
+        case Some(template) =>
+          new SnippetDecoration(resource, template, engine, allResources)
+        case _ =>
+          resource
+      } 
     else resource
-  }
-  
+
 }

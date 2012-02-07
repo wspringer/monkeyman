@@ -55,4 +55,9 @@ trait Resource {
    */
   def tags: Set[String]
 
+  /**
+   * If this resource should be included in the output.
+   */
+  def published: Boolean
+
 }

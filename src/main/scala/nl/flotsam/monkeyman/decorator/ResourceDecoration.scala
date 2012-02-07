@@ -35,4 +35,5 @@ class ResourceDecoration(resource: Resource) extends Resource {
 
   def tags = resource.tags
 
+  def published = resource.published
 }

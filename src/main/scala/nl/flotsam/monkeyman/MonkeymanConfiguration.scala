@@ -23,12 +23,13 @@ import decorator.haml.ScalateToHtmlDecorator
 import decorator.markdown.MarkdownToHtmlDecorator
 import decorator.permalink.PermalinkDecorator
 import decorator.registry.RegistryDecorator
+import decorator.snippet.SnippetDecorator
 import decorator.yaml.YamlFrontmatterDecorator
 import java.io.File
 import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Binding, Template, TemplateEngine}
 
-class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
+case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
   private val layoutFileName = "layout"
   
@@ -53,7 +54,8 @@ class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
   
   val resourceLoader = new DecoratingResourceLoader(fileSystemResourceLoader,
     new YamlFrontmatterDecorator(),
-    new MarkdownToHtmlDecorator(templateEngine, layoutResolver, registryDecorator.allResources _),
+    new MarkdownToHtmlDecorator(),
+    new SnippetDecorator(layoutResolver, templateEngine, registryDecorator.allResources _),
     new ScalateToHtmlDecorator(templateEngine, registryDecorator.allResources _),
     PermalinkDecorator,
     registryDecorator

@@ -22,13 +22,11 @@ package nl.flotsam.monkeyman.decorator.markdown
 import nl.flotsam.monkeyman.Resource
 import nl.flotsam.monkeyman.decorator.ResourceDecoration
 import nl.flotsam.monkeyman.util.Closeables._
-import org.fusesource.scalate.{DefaultRenderContext, TemplateEngine, Template}
 import org.apache.commons.io.{FilenameUtils, IOUtils}
-import java.io.{PrintWriter, StringWriter}
 import org.pegdown.ast.{TextNode, HeaderNode}
 import org.pegdown.{LinkRenderer, ToHtmlSerializer, PegDownProcessor}
 
-case class MarkdownToHtmlDecoration(resource: Resource, template: Option[Template], engine: TemplateEngine, allResources: () => Seq[Resource])
+case class MarkdownToHtmlDecoration(resource: Resource)
   extends ResourceDecoration(resource) {
 
   lazy val (extractedTitle, html) = {
@@ -46,26 +44,11 @@ case class MarkdownToHtmlDecoration(resource: Resource, template: Option[Templat
 
   override def title = resource.title.orElse(extractedTitle)
 
-  override val contentType =
-    if (template.isDefined) "text/html"
-    else "text/plain"
+  override val contentType = "text/x-html-fragment"
 
-  override lazy val path =
-    if (template.isDefined) FilenameUtils.removeExtension(resource.path) + ".html"
-    else resource.path
+  override lazy val path = FilenameUtils.removeExtension(resource.path) + ".frag"
 
-  override def open =
-    if (template.isDefined) {
-      val writer = new StringWriter
-      val context = new DefaultRenderContext(path, engine, new PrintWriter(writer))
-      context.attributes("body") = html
-      context.attributes("title") = title
-      context.attributes("allResources") = allResources()
-      template.get.render(context)
-      IOUtils.toInputStream(writer.getBuffer, "UTF-8")
-    } else {
-      IOUtils.toInputStream(html)
-    }
+  override def open = IOUtils.toInputStream(html)
 
   trait TitleExtractor extends ToHtmlSerializer {
     var inheader = false
