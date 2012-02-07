@@ -21,9 +21,9 @@ package nl.flotsam.monkeyman
 
 import java.io.File
 import org.apache.commons.io.FileUtils
-import org.apache.commons.io.filefilter.TrueFileFilter
-import collection.JavaConversions._
 import nl.flotsam.monkeyman.ext.ResourceUtils
+import org.apache.commons.io.filefilter.{SuffixFileFilter, OrFileFilter, NotFileFilter, TrueFileFilter}
+import collection.JavaConversions._
 
 class FileSystemResourceLoader(baseDir: File) extends ResourceLoader {
 
@@ -32,7 +32,10 @@ class FileSystemResourceLoader(baseDir: File) extends ResourceLoader {
   }
 
   def load = {
-    FileUtils.listFiles(baseDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).map(load).toSeq
+    FileUtils.listFiles(baseDir,
+      new NotFileFilter(
+        new SuffixFileFilter("~")
+      ), TrueFileFilter.INSTANCE).map(load).toSeq
   }
 
 }

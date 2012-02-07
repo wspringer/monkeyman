@@ -40,4 +40,5 @@ case class FileSystemResource(baseDir: File, path: String) extends Resource {
   def tags = Set.empty
 
   def published = true
+
 }
