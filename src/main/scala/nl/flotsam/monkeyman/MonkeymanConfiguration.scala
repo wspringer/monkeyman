@@ -32,11 +32,11 @@ import org.fusesource.scalate.{Binding, Template, TemplateEngine}
 case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
   private val layoutFileName = "layout"
-  
+
   private val templateEngine =
     new TemplateEngine(List(layoutDir, sourceDir))
 
-  private val fileSystemResourceLoader = 
+  private val fileSystemResourceLoader =
     new FileSystemResourceLoader(sourceDir)
 
   private val layoutResolver = new LayoutResolver {
@@ -51,18 +51,20 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
     defaultValue = Some("Seq.empty[nl.flotsam.monkeyman.Resource]")
   ) :: templateEngine.bindings
 
-  
-  val resourceLoader = new DecoratingResourceLoader(fileSystemResourceLoader,
-    new YamlFrontmatterDecorator(),
-    new MarkdownDecorator(),
-    new SnippetDecorator(layoutResolver, templateEngine, registryDecorator.allResources _),
-    new ScalateDecorator(templateEngine, registryDecorator.allResources _),
-    PermalinkDecorator,
-    registryDecorator
+
+  val resourceLoader = new PublicationAwareResourceLoader(
+    new DecoratingResourceLoader(fileSystemResourceLoader,
+      new YamlFrontmatterDecorator(),
+      new MarkdownDecorator(),
+      new SnippetDecorator(layoutResolver, templateEngine, registryDecorator.allResources _),
+      new ScalateDecorator(templateEngine, registryDecorator.allResources _),
+      PermalinkDecorator,
+      registryDecorator
+    )
   )
-  
+
   private def tryLoadTemplate(dir: File): Option[Template] = {
-    val files = 
+    val files =
       TemplateEngine.templateTypes.view.map(ext => new File(dir, layoutFileName + "." + ext))
     files.find(_.exists()) match {
       case Some(file) =>
@@ -71,7 +73,7 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
         if (dir != layoutDir) tryLoadTemplate(dir.getParentFile)
         else None
     }
-    
+
   }
 
 }
