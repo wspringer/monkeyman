@@ -22,7 +22,7 @@ package nl.flotsam.monkeyman
 import java.io.File
 import org.apache.commons.io.FileUtils
 import nl.flotsam.monkeyman.ext.ResourceUtils
-import org.apache.commons.io.filefilter.{SuffixFileFilter, OrFileFilter, NotFileFilter, TrueFileFilter}
+import org.apache.commons.io.filefilter.{SuffixFileFilter, NotFileFilter, TrueFileFilter}
 import collection.JavaConversions._
 
 class FileSystemResourceLoader(baseDir: File) extends ResourceLoader {
