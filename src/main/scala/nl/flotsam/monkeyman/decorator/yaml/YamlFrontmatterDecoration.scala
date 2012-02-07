@@ -23,7 +23,6 @@ import nl.flotsam.monkeyman.Resource
 import nl.flotsam.monkeyman.util.Closeables._
 import scala.util.control.Exception._
 import org.apache.commons.io.IOUtils
-import collection.JavaConversions._
 import nl.flotsam.monkeyman.decorator.ResourceDecoration
 
 /**
@@ -46,6 +45,8 @@ class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(r
     val title = attributes.get("title")
     title.orElse(resource.title)
   }
+
+  override def published = attributes.get("published").getOrElse(resource.published)
 
   override def tags = 
     resource.tags ++ attributes.get("tags").map(_.split(",")).getOrElse(Array.empty)
