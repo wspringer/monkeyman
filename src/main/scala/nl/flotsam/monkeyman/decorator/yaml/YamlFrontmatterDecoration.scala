@@ -46,7 +46,7 @@ class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(r
     title.orElse(resource.title)
   }
 
-  override def published = attributes.get("published").getOrElse(resource.published)
+  override def published = attributes.get("published").flatMap(str => allCatch.opt(str.toBoolean)).getOrElse(resource.published)
 
   override def tags = 
     resource.tags ++ attributes.get("tags").map(_.split(",")).getOrElse(Array.empty)

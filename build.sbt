@@ -6,11 +6,7 @@ scalaVersion := "2.8.1"
 
 libraryDependencies ++= Seq(
   "org.pegdown" % "pegdown" % "1.1.0",
-  "net.databinder" %% "unfiltered-filter" % "0.5.0",
-  "net.databinder" %% "unfiltered-jetty" % "0.5.0",
-  "net.databinder" %% "unfiltered-scalate" % "0.5.0",
   "org.fusesource.scalamd" % "scalamd" % "1.5",
-  "org.clapper" %% "avsl" % "0.3.6",
   "joda-time" % "joda-time" % "2.0",
   "eu.medsea.mimeutil" % "mime-util" % "2.1.3",
   "commons-io" % "commons-io" % "2.1",
@@ -29,3 +25,9 @@ resolvers ++= Seq(
 initialCommands in console := "import java.io._; import nl.flotsam.monkeyman._"
 
 mainClass in (Compile, run) := Some("nl.flotsam.monkeyman.Monkeyman")
+
+mainClass in (Compile, packageBin) := Some("nl.flotsam.monkeyman.Monkeyman")
+
+seq(ProguardPlugin.proguardSettings :_*)
+
+proguardOptions += keepMain("nl.flotsam.monkeyman.Monkeyman")
