@@ -19,11 +19,11 @@
 
 package nl.flotsam.monkeyman
 
-import org.joda.time.LocalDate
 import java.io.{FileInputStream, File}
 import eu.medsea.mimeutil.{MimeType, MimeUtil}
 import collection.JavaConversions
 import JavaConversions._
+import org.joda.time.LocalDateTime
 
 case class FileSystemResource(baseDir: File, path: String) extends Resource {
 
@@ -31,7 +31,7 @@ case class FileSystemResource(baseDir: File, path: String) extends Resource {
 
   lazy val title = None
 
-  lazy val pubDate = Some(new LocalDate(file.lastModified()))
+  lazy val pubDateTime = new LocalDateTime(file.lastModified())
 
   lazy val contentType = MimeUtil.getMimeTypes(file).asInstanceOf[java.util.Set[MimeType]].head.toString
 

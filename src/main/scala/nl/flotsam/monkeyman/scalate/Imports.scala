@@ -19,13 +19,13 @@
 
 package nl.flotsam.monkeyman.scalate
 
-import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
+
 
 object Imports {
   
-  implicit object LocalDateOrdering extends Ordering[LocalDate] {
-    def compare(x: LocalDate, y: LocalDate) = 
-      x.compareTo(y)
+  implicit object LocalDateTimeOrdering extends Ordering[LocalDateTime] {
+    def compare(x: LocalDateTime, y: LocalDateTime) = x.compareTo(y)
   }
 
 }

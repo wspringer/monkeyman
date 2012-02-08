@@ -20,7 +20,7 @@
 package nl.flotsam.monkeyman
 
 import java.io.InputStream
-import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 
 
 trait Resource {
@@ -33,7 +33,7 @@ trait Resource {
   /**
    * The date from which on this file should be considered published. (Note: that doesn't mean it will stay there forever, it just allows you to hold off publication if you don't want to and have a publication date if that's what you want to display.
    */
-  def pubDate: Option[LocalDate]
+  def pubDateTime: LocalDateTime
 
   /**
    * The type of resource.
