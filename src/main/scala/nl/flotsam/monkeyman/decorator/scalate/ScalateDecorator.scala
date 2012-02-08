@@ -22,7 +22,6 @@ package nl.flotsam.monkeyman.decorator.scalate
 import org.fusesource.scalate.TemplateEngine
 import org.fusesource.scalate.support.FileTemplateSource
 import nl.flotsam.monkeyman.{FileSystemResource, Resource, ResourceDecorator}
-import scala.util.control.Exception._
 import org.apache.commons.io.FilenameUtils
 
 

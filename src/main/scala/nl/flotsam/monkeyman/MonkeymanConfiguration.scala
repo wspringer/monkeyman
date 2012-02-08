@@ -45,6 +45,10 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
   }
 
   val registryDecorator = new RegistryDecorator
+
+  templateEngine.importStatements = "import nl.flotsam.monkeyman.scalate.Imports._" ::
+    templateEngine.importStatements
+
   templateEngine.bindings = new Binding(
     name = "allResources",
     className = "Seq[nl.flotsam.monkeyman.Resource]",
