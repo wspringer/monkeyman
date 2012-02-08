@@ -35,7 +35,7 @@ case class MarkdownDecoration(resource: Resource)
         val markdown = IOUtils.toString(in, "UTF-8")
         val processor = new PegDownProcessor
         val rootNode = processor.parseMarkdown(markdown.toCharArray)
-        val visitor = new ToHtmlSerializer(new LinkRenderer) with TitleExtractor
+        val visitor = new TitleExtractingToHtmlSerializer(new LinkRenderer)
         val html = visitor.toHtml(rootNode)
         val title = visitor.title
         (title, html)
@@ -52,19 +52,26 @@ case class MarkdownDecoration(resource: Resource)
 
   override def asHtmlFragment = Some(html)
 
-  trait TitleExtractor extends ToHtmlSerializer {
+  class TitleExtractingToHtmlSerializer(linkRenderer: LinkRenderer) extends ToHtmlSerializer(linkRenderer) {
     var inheader = false
     var title: Option[String] = None
 
     override def visit(node: HeaderNode) {
-      if (title.isEmpty) inheader = true
-      super.visit(node)
-      inheader = false
+      if (title.isEmpty) {
+        inheader = true
+        visitChildren(node)
+        inheader = false
+      } else {
+        super.visit(node)
+      }
     }
 
     override def visit(node: TextNode) {
-      if (inheader && title.isEmpty) title = Some(node.getText)
-      super.visit(node)
+      if (inheader && title.isEmpty) {
+        title = Some(node.getText)
+      } else {
+        super.visit(node)
+      }
     }
   }
 

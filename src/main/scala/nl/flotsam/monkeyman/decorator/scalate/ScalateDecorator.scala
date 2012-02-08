@@ -23,18 +23,21 @@ import org.fusesource.scalate.TemplateEngine
 import org.fusesource.scalate.support.FileTemplateSource
 import nl.flotsam.monkeyman.{FileSystemResource, Resource, ResourceDecorator}
 import scala.util.control.Exception._
+import org.apache.commons.io.FilenameUtils
 
 
 class ScalateDecorator(engine: TemplateEngine, allResources: () => Seq[Resource]) extends ResourceDecorator {
 
   def decorate(resource: Resource) = resource match {
-    case res @ FileSystemResource(_, _) =>
+    case res @ FileSystemResource(_, _) if TemplateEngine.templateTypes.contains(FilenameUtils.getExtension(res.path)) =>
       val source = new FileTemplateSource(res.file, resource.path)
-      allCatch.opt(engine.load(source))
-        .map {
-          template =>
-            new ScalateDecoration(resource, template, engine, allResources)
-        }.getOrElse(resource)
+      try {
+        new ScalateDecoration(resource, engine.load(source), engine, allResources)
+      } catch {
+        case t: Throwable =>
+          System.err.println(t.getMessage)
+          resource
+      }
     case _ => resource
   } 
   
