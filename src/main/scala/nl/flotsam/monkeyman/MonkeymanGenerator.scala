@@ -22,12 +22,12 @@ package nl.flotsam.monkeyman
 import org.clapper.argot.{ArgotUsageException, ArgotParser}
 import org.clapper.argot.ArgotConverters._
 import java.io.File
-import util.Closeables
+import util.{Closeables, Logging}
 import Closeables._
 import org.apache.commons.io.FileUtils
 
 
-object MonkeymanGenerator {
+object MonkeymanGenerator extends Logging {
 
   private val workingDir = new File(System.getProperty("user.dir"))
 
@@ -92,6 +92,7 @@ object MonkeymanGenerator {
     for (resource <- config.resourceLoader.load) {
       val targetFile = new File(targetDir, resource.path)
       using(resource.open) {
+        info("Generating {}", resource.path)
         FileUtils.copyInputStreamToFile(_, targetFile)
       }
     }
