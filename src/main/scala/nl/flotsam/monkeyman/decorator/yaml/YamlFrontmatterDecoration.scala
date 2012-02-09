@@ -24,14 +24,27 @@ import nl.flotsam.monkeyman.util.Closeables._
 import scala.util.control.Exception._
 import org.apache.commons.io.IOUtils
 import nl.flotsam.monkeyman.decorator.ResourceDecoration
+import nl.flotsam.monkeyman.util.Logging
+import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
+import org.joda.time.LocalDateTime
 
 /**
  * Mimics YAML front matter extraction. Not really YAML, but who cares?
  */
-class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(resource) {
+class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(resource) with Logging {
 
-  type AttributeSet = Map[String, String]
-  
+  private val pattern1 = DateTimeFormat.forPattern("yyyy-MM-dd hh:mm")
+  private val pattern2 = DateTimeFormat.forPattern("yyyy-MM-dd")
+
+  private def parse(str: String): Option[LocalDateTime] = {
+    val patterns = Stream(pattern1, pattern2)
+    
+    def tryParse(pattern: DateTimeFormatter) =
+      allCatch.opt(pattern.parseLocalDateTime(str))
+    
+    patterns.flatMap(tryParse).headOption
+  }
+
   lazy val (attributes, content) = {
     allCatch.opt(using(resource.open)(IOUtils.toString(_, "UTF-8"))) match {
       case Some(str) =>
@@ -48,8 +61,18 @@ class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(r
 
   override def published = attributes.get("published").flatMap(str => allCatch.opt(str.toBoolean)).getOrElse(resource.published)
 
-  override def tags = 
+  override def tags =
     resource.tags ++ attributes.get("tags").map(_.split(",").map(_.trim)).getOrElse(Array.empty)
+
+  override def pubDateTime = attributes.get("pubDateTime") match {
+    case Some(str) =>
+      parse(str).getOrElse {
+        warn("Failed to parse pubDateTime in %s".format(resource.path))
+        resource.pubDateTime
+      }
+    case None =>
+      resource.pubDateTime
+  }
 
   override def open = {
     if (content.isDefined) IOUtils.toInputStream(content.get, "UTF-8")
