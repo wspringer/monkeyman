@@ -1,0 +1,46 @@
+body {
+   font-family: Helvetica, Arial, sans;
+   font-size: 12pt;
+   color: 4B4B4B;
+}
+
+.post {
+   margin-left: auto;
+   margin-right: auto;
+   width: 800px;
+}
+
+h1 {
+   margin-top: 30px;
+   margin-bottom: 60px;
+   color: #303030;
+}
+
+h2 {
+   margin-top: 50px;
+   margin-bottom: 20px;
+   color: #303030;
+}
+
+.tag {
+   padding-top: 1px;
+   padding-bottom: 1px;
+   padding-right: 5px;
+   padding-left: 5px;
+   -moz-border-radius: 9px;
+   border-radius: 9px;
+   border: 1px #AECDDB solid;
+   background-color: #D1EFF7;
+}
+
+code {
+   font-family: Monaco, Consolas, Courier;
+}
+
+pre {
+   margin-top: 20px;
+   margin-bottom: 20px;
+   padding: 15px;
+   background-color: #F9F9F9;
+   border: 1px #EEEEEE solid;
+}

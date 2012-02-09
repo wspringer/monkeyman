@@ -1,0 +1,22 @@
+- val dateFormat = org.joda.time.format.DateTimeFormat.forPattern("EEEE d MMMM, hh:mm")
+%html
+  %head
+    %title
+    %link(href={uri("css/default.css")} rel="stylesheet" type="text/css")
+  %body
+    - val matching = allResources
+    -   .filter(_.tags.contains("blog"))
+    -   .sortBy(_.pubDateTime)
+    -   .reverse
+    -   .take(3)
+    - for (resource <- matching)
+      .post
+        %h1.title
+          %a(href={resource.path})= resource.title
+        .pubDate= dateFormat.print(resource.pubDateTime)
+        .body
+          - unescape(resource.asHtmlFragment)
+        .tags
+          - for (tag <- resource.tags - "blog")
+            %span.tag= tag
+    
