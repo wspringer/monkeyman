@@ -25,6 +25,7 @@ import decorator.registry.RegistryDecorator
 import decorator.scalate.ScalateDecorator
 import decorator.snippet.SnippetDecorator
 import decorator.yaml.YamlFrontmatterDecorator
+import decorator.zuss.ZussDecorator
 import java.io.File
 import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Binding, Template, TemplateEngine}
@@ -70,6 +71,7 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
   val resourceLoader = new PublicationAwareResourceLoader(
     new DecoratingResourceLoader(fileSystemResourceLoader,
+      new ZussDecorator,
       new YamlFrontmatterDecorator(),
       new MarkdownDecorator(),
       new SnippetDecorator(layoutResolver, templateEngine, registryDecorator.allResources _),

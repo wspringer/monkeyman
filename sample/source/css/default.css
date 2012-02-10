@@ -10,27 +10,38 @@ body {
    width: 800px;
 }
 
+.post .body {
+   margin-bottom: 35px;
+}
+
 h1 {
    margin-top: 30px;
    margin-bottom: 60px;
-   color: #303030;
+   color: #393939;
+}
+
+h1.title {
+   font-family: 'Alfa Slab One', cursive;
+   font-size: 70px;
+   line-height: 90%;
 }
 
 h2 {
    margin-top: 50px;
    margin-bottom: 20px;
-   color: #303030;
+   color: #393939;
 }
 
 .tag {
+   color: #767F84;
    padding-top: 1px;
    padding-bottom: 1px;
    padding-right: 5px;
    padding-left: 5px;
    -moz-border-radius: 9px;
    border-radius: 9px;
-   border: 1px #AECDDB solid;
-   background-color: #D1EFF7;
+   border: 1px #DCE9F1 solid;
+   background-color: #ECF9FF;
 }
 
 code {
@@ -43,4 +54,20 @@ pre {
    padding: 15px;
    background-color: #F9F9F9;
    border: 1px #EEEEEE solid;
+}
+
+h1 a { text-decoration: none; }
+h1 a:link { color: #393939; }
+h1 a:visited { color: #393939; }
+h1 a:hover { color: #494949; }
+h1 a:active { color: #393939; }
+
+.post {
+  margin-bottom: 100px;
+}
+
+.pubDate {
+   font-weight: 300;
+   font-size: 16px;
+   margin-bottom: 40px;
 }
