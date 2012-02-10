@@ -22,12 +22,15 @@ created if there _would_ have been a solution that supports:
 If ever such a solution arrives, then there is a chance Monkeyman will
 no longer be maintained.
 
+## Other features
+
+* Jade, HAML (SCAML), SSP support (through Scalate)
+* ZUSS support (Java alternative for LESS/SCSS)
+
 ## Usage
 
 For information on how to _use_ Monkeyman, check the [sample blog]
-(https://github.com/wspringer/monkeyman/blob/master/sample/source/). The
-blog itself hasn't been uploaded to the server yet, but just work your
-way through the `1.md` and `2.md` file, and you will get the hang of it.
+(http://monkeyman.flotsam.nl/). 
 
 ##Limitations
 
