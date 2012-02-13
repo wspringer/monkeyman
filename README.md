@@ -32,9 +32,20 @@ no longer be maintained.
 For information on how to _use_ Monkeyman, check the [sample blog]
 (http://monkeyman.flotsam.nl/). 
 
-##Limitations
+But basically, it boils down to this:
 
-Live preview is not implemented yet. Once it's there, you will be able
-to get it by typing `monkeyman server`.
+* Create a `source` directory; store HAML, Jade, SSP, Markdown files
+  with YAML frontmatter and other static resources in that directory.
+* Create a `layout` directory; store HAML, Jade or SSP layouts in that
+  directory. 
+* Have a web server pick up all of the changes you are making,
+  providing you live preview, by typing `monkeyman server`. 
+* Build your final version in the `target` directory, by typing
+  `middleman generate`. 
 
+## Changes
+
+0.1
+
+2012-02-13: Add live preview support.
 
