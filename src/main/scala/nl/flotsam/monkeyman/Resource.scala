@@ -22,7 +22,6 @@ package nl.flotsam.monkeyman
 import java.io.InputStream
 import org.joda.time.LocalDateTime
 
-
 trait Resource {
 
   /**
@@ -31,7 +30,9 @@ trait Resource {
   def title: Option[String]
 
   /**
-   * The date from which on this file should be considered published. (Note: that doesn't mean it will stay there forever, it just allows you to hold off publication if you don't want to and have a publication date if that's what you want to display.
+   * The date from which on this file should be considered published. (Note: that doesn't mean it will stay there
+   * forever, it just allows you to hold off publication if you don't want to and have a publication date if that's
+   * what you want to display.
    */
   def pubDateTime: LocalDateTime
 
