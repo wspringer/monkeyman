@@ -62,8 +62,13 @@ trait Resource {
   def published: Boolean
 
   /**
-   * Get an HTML fragment to be inlcuded somewhere else.
+   * Get an HTML fragment to be included somewhere else.
    */
   def asHtmlFragment: Option[String]
 
+  /**
+   * The unique identifier of this resource. Doesn't change during its lifetime.
+   */
+  def id: String
+  
 }

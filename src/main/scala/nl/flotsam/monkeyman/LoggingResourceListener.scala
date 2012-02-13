@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer
+ * Copyright (C) 2012  Wilfred Springer	
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,19 +17,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman.util
+package nl.flotsam.monkeyman
 
-import org.slf4j.LoggerFactory
+import util.Logging
 
-trait Logging {
+class LoggingResourceListener extends ResourceListener with Logging {
 
-  lazy val logger = LoggerFactory.getLogger(getClass)
+  def deleted(id: String) = info("Deleted {}", id)
 
-  def debug(message : =>String) = logger.debug(message)
-  def info(message : =>String, args: Any*)  = logger.info(message, args.toArray)
-  def warn(message : =>String, args: Any*)  = logger.warn(message, args.toArray)
-  def warn(message : =>String, e: Throwable)  = logger.warn(message, e)
-  def error(message : =>String) = logger.error(message)
-  def error(message : =>String, e : Throwable) = logger.error(message,e)
+  def added(resource: Resource) = info("Added {}", resource.id)
 
 }

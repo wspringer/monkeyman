@@ -25,5 +25,7 @@ package nl.flotsam.monkeyman
 trait ResourceLoader {
 
   def load: Seq[Resource]
+  
+  def register(listener: ResourceListener): Unit
 
 }

@@ -24,11 +24,52 @@ import org.apache.commons.io.FileUtils
 import nl.flotsam.monkeyman.ext.ResourceUtils
 import collection.JavaConversions._
 import org.apache.commons.io.filefilter._
+import net.contentobjects.jnotify.{JNotifyListener, JNotify}
+import scala.util.control.Exception.catching
+import collection.mutable.Buffer
 
-class FileSystemResourceLoader(baseDir: File) extends ResourceLoader {
+class FileSystemResourceLoader(baseDir: File)
+  extends ResourceLoader {
+
+  private val listeners = Buffer.empty[ResourceListener]
+
+  private val watchID: Option[Int] = catching(classOf[UnsatisfiedLinkError]).opt {
+    JNotify.addWatch(baseDir.getAbsolutePath, JNotify.FILE_CREATED & JNotify.FILE_MODIFIED & JNotify.FILE_RENAMED, true, new JNotifyListener() {
+
+      def fileCreated(wd: Int, rootPath: String, name: String) {
+        listeners.map(_.added(new FileSystemResource(baseDir, name)))
+      }
+
+      def fileDeleted(wd: Int, rootPath: String, name: String) {
+        listeners.map(_.deleted(name))
+      }
+
+      def fileModified(wd: Int, rootPath: String, name: String) {
+        println("***** MODIFIED ****")
+        listeners.map {
+          listener =>
+            listener.deleted(name)
+            listener.added(new FileSystemResource(baseDir, name))
+        }
+      }
+
+      def fileRenamed(wd: Int, rootPath: String, oldName: String, newName: String) {
+        listeners.map {
+          listener =>
+            listener.deleted(oldName)
+            listener.added(new FileSystemResource(baseDir, newName))
+        }
+      }
+    })
+  }
+
+  def dispose {
+    watchID.map(JNotify.removeWatch(_))
+  }
 
   def load(file: File) = {
-    new FileSystemResource(baseDir, ResourceUtils.getRelativePath(file.getAbsolutePath, baseDir.getAbsolutePath, File.separator))
+    new FileSystemResource(baseDir, ResourceUtils.getRelativePath(file.getAbsolutePath, baseDir.getAbsolutePath,
+      File.separator))
   }
 
   def load = {
@@ -43,4 +84,11 @@ class FileSystemResourceLoader(baseDir: File) extends ResourceLoader {
       ), TrueFileFilter.INSTANCE).map(load).toSeq
   }
 
+  def register(listener: ResourceListener) {
+    listeners += listener
+  }
+
+  def unregister(listener: ResourceListener) {
+    listeners -= listener
+  }
 }

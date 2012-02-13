@@ -44,7 +44,8 @@ object Monkeyman {
   }
 
   val tools = Map(
-    "generate" -> MonkeymanGenerator
+    "generate" -> MonkeymanGenerator,
+    "server" -> MonkeymanServer
   )
 
   def main(args: Array[String]) {
@@ -52,7 +53,8 @@ object Monkeyman {
       printUsage
     } else {
       tools.get(args(0)) match {
-        case Some(tool) => tool.main(args.tail)
+        case Some(tool) => 
+          tool.main(args.tail)
         case None => printUsage
       }
     }
