@@ -19,8 +19,13 @@
 
 package nl.flotsam.monkeyman
 
+/**
+ * The interface implemented by objects with the capability to gather all resources for a certain site.
+ */
 trait ResourceLoader {
-  
+
   def load: Seq[Resource]
+  
+  def register(listener: ResourceListener): Unit
 
 }

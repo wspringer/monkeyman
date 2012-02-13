@@ -19,8 +19,19 @@
 
 package nl.flotsam.monkeyman
 
+/**
+ * Resource decorates can adjust some of the properties of the resource passed in. Note that - even though the
+ * underlying resource *can* be considered immutable - it might be a good idea to implement the updated properties as
+ * lazy values, just for sake of optimization. If possible, use the content type as a trigger rather than the path
+ * name. Even though both the content type and the path name could change dynamically,
+ * the changes being made to the path name sometimes involve looking into the actual content,
+ * which might not be something you want to do for every resource you ever come across.
+ */
 trait ResourceDecorator {
 
+  /**
+   * Either turns the resource in an altered resource, or returns the original resource.
+   */
   def decorate(resource: Resource): Resource
 
 }

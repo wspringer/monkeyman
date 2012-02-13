@@ -42,4 +42,7 @@ case class FileSystemResource(baseDir: File, path: String) extends Resource {
   def published = true
 
   def asHtmlFragment = None
+
+  def id = path
+
 }

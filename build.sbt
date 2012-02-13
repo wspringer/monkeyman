@@ -40,3 +40,4 @@ seq(assemblySettings: _*)
 
 mainClass in assembly := Some("nl.flotsam.monkeyman.Monkeyman")
 
+fork in run := true
