@@ -39,7 +39,7 @@ class RegistryDecorator extends ResourceDecorator with ResourceListener with Log
   def deleted(id: String) {
     resourcesById.get(id) match {
       case Some(resource) => 
-        info("Removing {}", resource.path)
+        info("Removed {}", resource.path)
         resourcesById -= id
         resourceByPath -= resource.path
       case None =>
@@ -48,7 +48,13 @@ class RegistryDecorator extends ResourceDecorator with ResourceListener with Log
   }
 
   def added(resource: Resource) {
-    info("Adding {}", resource.path)
+    info("Added {}", resource.path)
+    resourcesById += resource.id -> resource
+    resourceByPath += resource.path -> resource
+  }
+
+  def modified(resource: Resource) {
+    info("Modified {}", resource.path)
     resourcesById += resource.id -> resource
     resourceByPath += resource.path -> resource
   }

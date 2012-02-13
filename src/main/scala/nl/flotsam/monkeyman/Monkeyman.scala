@@ -19,29 +19,8 @@
 
 package nl.flotsam.monkeyman
 
-import java.io.File
-import net.contentobjects.jnotify.JNotify
 
 object Monkeyman {
-
-  // Checking if we know how to load jnotify
-  private val jnotifyDir: Option[File] =
-    Option(classOf[JNotify].getClassLoader.getResource("net/contentobjects/jnotify/JNotify.class")).map {
-      location =>
-        val str = location.toExternalForm
-        val lastColon = str.lastIndexOf(":")
-        val firstExclamation = str.indexOf("!")
-        (new File(str.substring(lastColon + 1, firstExclamation))).getParentFile
-    }
-
-  // ... and if we do, assume the native libraries to be in exactly that same location
-  if (jnotifyDir.isDefined) {
-    println("Setting java.libray.path to " + jnotifyDir.get.getAbsolutePath)
-    System.setProperty("java.library.path", jnotifyDir.get.getAbsolutePath);
-    val fieldSysPath = classOf[ClassLoader].getDeclaredField("sys_paths")
-    fieldSysPath.setAccessible(true)
-    fieldSysPath.set(null, null)
-  }
 
   val tools = Map(
     "generate" -> MonkeymanGenerator,

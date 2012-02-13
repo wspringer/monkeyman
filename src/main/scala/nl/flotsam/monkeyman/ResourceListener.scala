@@ -22,6 +22,8 @@ package nl.flotsam.monkeyman
 trait ResourceListener {
 
   def deleted(id: String): Unit
+  
+  def modified(resource: Resource): Unit
 
   def added(resource: Resource): Unit
 

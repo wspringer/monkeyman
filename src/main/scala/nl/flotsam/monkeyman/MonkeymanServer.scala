@@ -60,7 +60,7 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
               }
           }
         case None =>
-          warn("Failed to find resource for {}", path)
+          exchange.sendResponseHeaders(404, 0)
       }
     }
   }

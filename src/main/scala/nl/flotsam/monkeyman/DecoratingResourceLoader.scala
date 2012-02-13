@@ -35,6 +35,11 @@ class DecoratingResourceLoader(loader: ResourceLoader, decorators: ResourceDecor
       def added(resource: Resource) {
         listener.added(decorate(resource))
       }
+
+      def modified(resource: Resource) {
+        listener.modified(decorate(resource))
+      }
+
     })
   }
 

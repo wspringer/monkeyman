@@ -19,52 +19,84 @@
 
 package nl.flotsam.monkeyman
 
-import java.io.File
 import org.apache.commons.io.FileUtils
 import nl.flotsam.monkeyman.ext.ResourceUtils
-import collection.JavaConversions._
 import org.apache.commons.io.filefilter._
-import net.contentobjects.jnotify.{JNotifyListener, JNotify}
-import scala.util.control.Exception.catching
 import collection.mutable.Buffer
+import name.pachler.nio.file.StandardWatchEventKind._
+import java.util.concurrent.Executors
+import java.io.{FileFilter, File}
+import collection.JavaConversions
+import JavaConversions._
+import util.Logging
+import name.pachler.nio.file._
 
 class FileSystemResourceLoader(baseDir: File)
-  extends ResourceLoader {
+  extends ResourceLoader with Logging {
+
+  def expand(dir: File): List[File] =
+    (Option(dir.listFiles(new FileFilter() {
+      def accept(subdir: File) = subdir.isDirectory
+    })) match {
+      case Some(subdirs) => dir :: subdirs.toList.flatMap(expand)
+      case None => List(dir)
+    })
+
+  def relative(path: Path) =
+    ResourceUtils.getRelativePath(path.toString, baseDir.getAbsolutePath, File.separator)
 
   private val listeners = Buffer.empty[ResourceListener]
+  private val keys = collection.mutable.Map.empty[WatchKey, Path]
+  private val watchService = FileSystems.getDefault.newWatchService()
 
-  private val watchID: Option[Int] = catching(classOf[UnsatisfiedLinkError]).opt {
-    JNotify.addWatch(baseDir.getAbsolutePath, JNotify.FILE_CREATED & JNotify.FILE_MODIFIED & JNotify.FILE_RENAMED, true, new JNotifyListener() {
-
-      def fileCreated(wd: Int, rootPath: String, name: String) {
-        listeners.map(_.added(new FileSystemResource(baseDir, name)))
-      }
-
-      def fileDeleted(wd: Int, rootPath: String, name: String) {
-        listeners.map(_.deleted(name))
-      }
-
-      def fileModified(wd: Int, rootPath: String, name: String) {
-        println("***** MODIFIED ****")
-        listeners.map {
-          listener =>
-            listener.deleted(name)
-            listener.added(new FileSystemResource(baseDir, name))
-        }
-      }
-
-      def fileRenamed(wd: Int, rootPath: String, oldName: String, newName: String) {
-        listeners.map {
-          listener =>
-            listener.deleted(oldName)
-            listener.added(new FileSystemResource(baseDir, newName))
+  for {
+    dir <- expand(baseDir)
+    path = Paths.get(dir.getAbsolutePath)
+  } {
+    keys += path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY) -> path
+    Executors.newSingleThreadExecutor().execute(new Runnable() {
+      def run() {
+        while (true) {
+          val watchKey: WatchKey = watchService.take()
+          keys.get(watchKey) match {
+            case Some(dir) =>
+              val events = watchKey.pollEvents().toList
+              watchKey.reset()
+              for (event <- events) {
+                if (event.kind() == ENTRY_CREATE) {
+                  val created = dir.resolve(event.context().asInstanceOf[Path])
+                  if ((new File(created.toString)).isDirectory) {
+                    debug("Added directory {}", created)
+                    keys += created.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY) -> created
+                  } else {
+                    debug("Added file {}", created)
+                    listeners.map(_.added(new FileSystemResource(baseDir, relative(created))))
+                  }
+                }
+                else if (event.kind() == ENTRY_DELETE) {
+                  val deleted = dir.resolve(event.context().asInstanceOf[Path])
+                  debug("Deleted {}", deleted)
+                  listeners.map(_.deleted(relative(deleted)))
+                }
+                else if (event.kind() == ENTRY_MODIFY) {
+                  val modified = dir.resolve(event.context().asInstanceOf[Path])
+                  if (!(new File(modified.toString)).isDirectory) {
+                    debug("Modified {}", modified)
+                    listeners.map(_.modified(new FileSystemResource(baseDir, relative(modified))))
+                  }
+                }
+              }
+            case _ =>
+          }
         }
       }
     })
   }
 
   def dispose {
-    watchID.map(JNotify.removeWatch(_))
+    for ((key, path) <- keys) {
+      key.cancel()
+    }
   }
 
   def load(file: File) = {

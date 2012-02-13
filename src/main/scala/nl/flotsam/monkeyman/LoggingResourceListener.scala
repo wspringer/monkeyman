@@ -23,8 +23,16 @@ import util.Logging
 
 class LoggingResourceListener extends ResourceListener with Logging {
 
-  def deleted(id: String) = info("Deleted {}", id)
+  def deleted(id: String) {
+    info("Deleted {}", id)
+  }
 
-  def added(resource: Resource) = info("Added {}", resource.id)
+  def added(resource: Resource) {
+    info("Added {}", resource.id)
+  }
+
+  def modified(resource: Resource) {
+    info("Modified {}", resource.id)
+  }
 
 }
