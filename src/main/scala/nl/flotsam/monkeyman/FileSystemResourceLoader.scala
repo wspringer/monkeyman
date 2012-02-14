@@ -19,16 +19,89 @@
 
 package nl.flotsam.monkeyman
 
-import java.io.File
 import org.apache.commons.io.FileUtils
 import nl.flotsam.monkeyman.ext.ResourceUtils
-import collection.JavaConversions._
 import org.apache.commons.io.filefilter._
+import collection.mutable.Buffer
+import name.pachler.nio.file.StandardWatchEventKind._
+import java.util.concurrent.Executors
+import java.io.{FileFilter, File}
+import collection.JavaConversions
+import JavaConversions._
+import util.Logging
+import name.pachler.nio.file._
 
-class FileSystemResourceLoader(baseDir: File) extends ResourceLoader {
+class FileSystemResourceLoader(baseDir: File)
+  extends ResourceLoader with Logging {
+
+  def expand(dir: File): List[File] =
+    (Option(dir.listFiles(new FileFilter() {
+      def accept(subdir: File) = subdir.isDirectory
+    })) match {
+      case Some(subdirs) => dir :: subdirs.toList.flatMap(expand)
+      case None => List(dir)
+    })
+
+  def relative(path: Path) =
+    ResourceUtils.getRelativePath(path.toString, baseDir.getAbsolutePath, File.separator)
+
+  private val listeners = Buffer.empty[ResourceListener]
+  private val keys = collection.mutable.Map.empty[WatchKey, Path]
+  private val watchService = FileSystems.getDefault.newWatchService()
+
+  for {
+    dir <- expand(baseDir)
+    path = Paths.get(dir.getAbsolutePath)
+  } {
+    keys += path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY) -> path
+    Executors.newSingleThreadExecutor().execute(new Runnable() {
+      def run() {
+        while (true) {
+          val watchKey: WatchKey = watchService.take()
+          keys.get(watchKey) match {
+            case Some(dir) =>
+              val events = watchKey.pollEvents().toList
+              watchKey.reset()
+              for (event <- events) {
+                if (event.kind() == ENTRY_CREATE) {
+                  val created = dir.resolve(event.context().asInstanceOf[Path])
+                  if ((new File(created.toString)).isDirectory) {
+                    debug("Added directory {}", created)
+                    keys += created.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY) -> created
+                  } else {
+                    debug("Added file {}", created)
+                    listeners.map(_.added(new FileSystemResource(baseDir, relative(created))))
+                  }
+                }
+                else if (event.kind() == ENTRY_DELETE) {
+                  val deleted = dir.resolve(event.context().asInstanceOf[Path])
+                  debug("Deleted {}", deleted)
+                  listeners.map(_.deleted(relative(deleted)))
+                }
+                else if (event.kind() == ENTRY_MODIFY) {
+                  val modified = dir.resolve(event.context().asInstanceOf[Path])
+                  if (!(new File(modified.toString)).isDirectory) {
+                    debug("Modified {}", modified)
+                    listeners.map(_.modified(new FileSystemResource(baseDir, relative(modified))))
+                  }
+                }
+              }
+            case _ =>
+          }
+        }
+      }
+    })
+  }
+
+  def dispose {
+    for ((key, path) <- keys) {
+      key.cancel()
+    }
+  }
 
   def load(file: File) = {
-    new FileSystemResource(baseDir, ResourceUtils.getRelativePath(file.getAbsolutePath, baseDir.getAbsolutePath, File.separator))
+    new FileSystemResource(baseDir, ResourceUtils.getRelativePath(file.getAbsolutePath, baseDir.getAbsolutePath,
+      File.separator))
   }
 
   def load = {
@@ -43,4 +116,11 @@ class FileSystemResourceLoader(baseDir: File) extends ResourceLoader {
       ), TrueFileFilter.INSTANCE).map(load).toSeq
   }
 
+  def register(listener: ResourceListener) {
+    listeners += listener
+  }
+
+  def unregister(listener: ResourceListener) {
+    listeners -= listener
+  }
 }

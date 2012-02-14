@@ -19,18 +19,44 @@
 
 package nl.flotsam.monkeyman.decorator.registry
 
-import collection.mutable.Buffer
-import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
+import nl.flotsam.monkeyman.{ResourceListener, Resource, ResourceDecorator}
+import nl.flotsam.monkeyman.util.Logging
 
 
-class RegistryDecorator extends ResourceDecorator {
+class RegistryDecorator extends ResourceDecorator with ResourceListener with Logging {
 
-  private val resources = Buffer.empty[Resource]
-
-  def allResources: List[Resource] = resources.toList
+  private val resourcesById = collection.mutable.Map.empty[String,  Resource]
+  val resourceByPath = collection.mutable.Map.empty[String,  Resource]
+  
+  def allResources: List[Resource] = resourcesById.values.toList
   
   def decorate(resource: Resource) = {
-    resources += resource
+    resourcesById += resource.id -> resource
+    resourceByPath += resource.path -> resource
     resource
   }
+
+  def deleted(id: String) {
+    resourcesById.get(id) match {
+      case Some(resource) => 
+        info("Removed {}", resource.path)
+        resourcesById -= id
+        resourceByPath -= resource.path
+      case None =>
+        // TODO: Add warning here
+    }
+  }
+
+  def added(resource: Resource) {
+    info("Added {}", resource.path)
+    resourcesById += resource.id -> resource
+    resourceByPath += resource.path -> resource
+  }
+
+  def modified(resource: Resource) {
+    info("Modified {}", resource.path)
+    resourcesById += resource.id -> resource
+    resourceByPath += resource.path -> resource
+  }
+
 }

@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer	
+ * Copyright (C) 2012  Wilfred Springer
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,8 +19,12 @@
 
 package nl.flotsam.monkeyman
 
-class PublicationAwareResourceLoader(loader: ResourceLoader) extends ResourceLoader {
+trait ResourceListener {
 
-  def load = loader.load.filter(_.published)
+  def deleted(id: String): Unit
+  
+  def modified(resource: Resource): Unit
+
+  def added(resource: Resource): Unit
 
 }

@@ -17,37 +17,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman
+package nl.flotsam.monkeyman.decorator.less
 
+import nl.flotsam.monkeyman.decorator.ResourceDecoration
+import nl.flotsam.monkeyman.FileSystemResource
+import com.asual.lesscss.LessEngine
+import org.apache.commons.io.{IOUtils, FilenameUtils}
 
-object Monkeyman {
+class LessDecoration(engine: LessEngine, resource: FileSystemResource) extends ResourceDecoration(resource) {
 
-  val tools = Map(
-    "generate" -> MonkeymanGenerator,
-    "server" -> MonkeymanServer
-  )
+  override lazy val path = FilenameUtils.removeExtension(resource.path) + ".css"
 
-  def main(args: Array[String]) {
-    if (args.length == 0) {
-      printUsage
-    } else {
-      tools.get(args(0)) match {
-        case Some(tool) => 
-          tool.main(args.tail)
-        case None => printUsage
-      }
-    }
-  }
+  override def contentType = "text/css"
 
-  def printUsage {
-    println("Usage:")
-    println()
-    for (key <- tools.keys) {
-      println("monkeyman " + key + " ARGS")
-    }
-    println()
-    println("Type 'monkeyman TOOL [-h|--help]' for more information.")
-    println()
+  override def open = {
+    // TODO: This thing behaves weird. It will just kill the thread in some cases, without an exception
+    val css = engine.compile(resource.file)
+    IOUtils.toInputStream(css, "UTF-8")
   }
 
 }

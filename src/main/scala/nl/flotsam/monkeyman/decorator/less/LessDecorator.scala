@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer
+ * Copyright (C) 2012  Wilfred Springer	
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,37 +17,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman
+package nl.flotsam.monkeyman.decorator.less
+
+import nl.flotsam.monkeyman.{FileSystemResource, Resource, ResourceDecorator}
+import com.asual.lesscss.LessEngine
 
 
-object Monkeyman {
+class LessDecorator extends ResourceDecorator {
 
-  val tools = Map(
-    "generate" -> MonkeymanGenerator,
-    "server" -> MonkeymanServer
-  )
+  val engine = new LessEngine()
 
-  def main(args: Array[String]) {
-    if (args.length == 0) {
-      printUsage
-    } else {
-      tools.get(args(0)) match {
-        case Some(tool) => 
-          tool.main(args.tail)
-        case None => printUsage
-      }
-    }
-  }
-
-  def printUsage {
-    println("Usage:")
-    println()
-    for (key <- tools.keys) {
-      println("monkeyman " + key + " ARGS")
-    }
-    println()
-    println("Type 'monkeyman TOOL [-h|--help]' for more information.")
-    println()
+  def decorate(resource: Resource) = resource match {
+    case fileSystemResource: FileSystemResource if fileSystemResource.file.getName.endsWith(".less") =>
+      new LessDecoration(engine, fileSystemResource)
+    case _ =>
+      resource
   }
 
 }

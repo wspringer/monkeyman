@@ -1,8 +1,0 @@
-- val title: Option[String]
-- val body: Option[String]
-%html
-  %head
-    %title= title.getOrElse("No title")
-  %body
-    - unescape(body.getOrElse(""))
-      

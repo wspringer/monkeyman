@@ -26,4 +26,21 @@ class DecoratingResourceLoader(loader: ResourceLoader, decorators: ResourceDecor
   def decorate(resource: Resource): Resource =
     decorators.foldLeft(resource)((resource, decorator) => decorator.decorate(resource))
 
+  def register(listener: ResourceListener) {
+    loader.register(new ResourceListener {
+      def deleted(id: String) {
+        listener.deleted(id)
+      }
+
+      def added(resource: Resource) {
+        listener.added(decorate(resource))
+      }
+
+      def modified(resource: Resource) {
+        listener.modified(decorate(resource))
+      }
+
+    })
+  }
+
 }

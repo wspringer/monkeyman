@@ -19,6 +19,7 @@
 
 package nl.flotsam.monkeyman
 
+import decorator.less.LessDecorator
 import decorator.markdown.MarkdownDecorator
 import decorator.permalink.PermalinkDecorator
 import decorator.registry.RegistryDecorator
@@ -45,6 +46,10 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
       tryLoadTemplate(new File(layoutDir, getPath(path)))
   }
 
+  def dispose {
+    fileSystemResourceLoader.dispose
+  }
+  
   val registryDecorator = new RegistryDecorator
 
   templateEngine.importStatements = "import nl.flotsam.monkeyman.scalate.Imports._" ::
@@ -69,8 +74,9 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
   ) :: templateEngine.bindings
 
 
-  val resourceLoader = new PublicationAwareResourceLoader(
+  val resourceLoader =
     new DecoratingResourceLoader(fileSystemResourceLoader,
+      new LessDecorator,
       new ZussDecorator,
       new YamlFrontmatterDecorator(),
       new MarkdownDecorator(),
@@ -78,8 +84,9 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
       new ScalateDecorator(templateEngine, registryDecorator.allResources _),
       PermalinkDecorator,
       registryDecorator
-    )
   )
+
+  resourceLoader.register(registryDecorator)
 
   private def tryLoadTemplate(dir: File): Option[Template] = {
     val files =
