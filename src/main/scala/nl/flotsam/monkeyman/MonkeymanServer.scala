@@ -42,25 +42,28 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
   class MonkeymanHandler(config: MonkeymanConfiguration) extends HttpHandler {
     def handle(exchange: HttpExchange) {
       val path = exchange.getRequestURI.getPath
-      if (exchange.getRequestMethod == "GET")
-        info("Handling request for {}", path)
-      val lookup =
-        if (path == "/") "index.html"
-        else path.substring(1)
-      config.registryDecorator.resourceByPath.get(lookup) match {
-        case Some(resource) =>
-          val responseHeaders = exchange.getResponseHeaders
-          responseHeaders.set("Content-Type", resource.contentType)
-          exchange.sendResponseHeaders(200, 0)
-          using(resource.open) {
-            in =>
-              using(exchange.getResponseBody) {
-                out =>
-                 IOUtils.copy(in, out)
-              }
-          }
-        case None =>
-          exchange.sendResponseHeaders(404, 0)
+      info("Handling {} for {}", exchange.getRequestMethod, path)
+      if (exchange.getRequestMethod == "GET") {
+        val lookup =
+          if (path == "/") "index.html"
+          else path.substring(1)
+        config.registryDecorator.resourceByPath.get(lookup) match {
+          case Some(resource) =>
+            val responseHeaders = exchange.getResponseHeaders
+            responseHeaders.set("Content-Type", resource.contentType)
+            exchange.sendResponseHeaders(200, 0)
+            using(resource.open) {
+              in =>
+                using(exchange.getResponseBody) {
+                  out =>
+                    IOUtils.copy(in, out)
+                }
+            }
+          case None =>
+            exchange.sendResponseHeaders(404, 0)
+        }
+      } else {
+        exchange.sendResponseHeaders(404, 0)
       }
     }
   }
