@@ -19,6 +19,7 @@
 
 package nl.flotsam.monkeyman
 
+import decorator.less.LessDecorator
 import decorator.markdown.MarkdownDecorator
 import decorator.permalink.PermalinkDecorator
 import decorator.registry.RegistryDecorator
@@ -75,6 +76,7 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
   val resourceLoader =
     new DecoratingResourceLoader(fileSystemResourceLoader,
+      new LessDecorator,
       new ZussDecorator,
       new YamlFrontmatterDecorator(),
       new MarkdownDecorator(),
