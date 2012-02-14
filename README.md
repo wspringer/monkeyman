@@ -48,4 +48,5 @@ But basically, it boils down to this:
 0.1
 
 2012-02-13: Add live preview support.
+2012-02-14: Add LESS support.
 
