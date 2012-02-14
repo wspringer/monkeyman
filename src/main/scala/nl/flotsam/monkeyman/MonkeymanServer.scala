@@ -25,17 +25,25 @@ import java.net.InetSocketAddress
 import com.sun.net.httpserver.{HttpServer, HttpExchange, HttpHandler}
 import java.util.concurrent.Executors
 import util.Logging
+import org.clapper.argot.ArgotConverters._
 
 
 object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
 
+  private val DEFAULT_PORT: Int = 4567
+
+  private val port = parser.option[Int](List("p", "port"), "PORT",
+    "The port on which the server will be listening. Defaults to " + DEFAULT_PORT + ".")
+  
   def execute(config: MonkeymanConfiguration) {
     config.resourceLoader.load // Force all resources to be loaded
-    val address = new InetSocketAddress(8090)
+    val selectedPort = port.value.getOrElse(DEFAULT_PORT)
+    val address = new InetSocketAddress(selectedPort)
     val server = HttpServer.create(address, 0)
     server.createContext("/", new MonkeymanHandler(config))
     server.setExecutor(Executors.newCachedThreadPool())
     server.start()
+    info("The Monkeyman is standing watch on port {}", selectedPort)
     while (true) Thread.sleep(1000)
   }
 
