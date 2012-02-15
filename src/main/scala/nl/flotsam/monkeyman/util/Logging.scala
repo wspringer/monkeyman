@@ -25,9 +25,9 @@ trait Logging {
 
   lazy val logger = LoggerFactory.getLogger(getClass)
 
-  def debug(message: => String, args: Any*) = logger.debug(message, args.toArray)
-  def info(message: => String, args: Any*)  = logger.info(message, args.toArray)
-  def warn(message: => String, args: Any*)  = logger.warn(message, args.toArray)
+  def debug(message: => String, args: Any*) = logger.debug(message, args.toArray.map(_.asInstanceOf[AnyRef]).toArray[AnyRef])
+  def info(message: => String, args: Any*)  = logger.info(message, args.map(_.asInstanceOf[AnyRef]).toArray[AnyRef])
+  def warn(message: => String, args: Any*)  = logger.warn(message, args.map(_.asInstanceOf[AnyRef]).toArray[AnyRef])
   def warn(message: => String, e: Throwable)  = logger.warn(message, e)
   def error(message: => String) = logger.error(message)
   def error(message: => String, e : Throwable) = logger.error(message,e)
