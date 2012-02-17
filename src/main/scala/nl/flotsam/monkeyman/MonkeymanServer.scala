@@ -68,11 +68,20 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
                 }
             }
           case None =>
-            exchange.sendResponseHeaders(404, 0)
+            sendStatus(404, "Not found", exchange)
         }
       } else {
-        exchange.sendResponseHeaders(404, 0)
+        sendStatus(405, "Method not allowed", exchange)
       }
+    }
+  }
+
+  private def sendStatus(status: Int, message: String, exchange: HttpExchange) {
+    val responseHeaders = exchange.getResponseHeaders
+    responseHeaders.set("Content-Type", "text/plain")
+    exchange.sendResponseHeaders(status, 0)
+    using(exchange.getResponseBody) {
+      out => out.write(message.getBytes("UTF-8"))
     }
   }
 
