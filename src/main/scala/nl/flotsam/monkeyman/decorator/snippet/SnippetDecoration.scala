@@ -20,13 +20,13 @@
 package nl.flotsam.monkeyman.decorator.snippet
 
 import nl.flotsam.monkeyman.decorator.ResourceDecoration
-import nl.flotsam.monkeyman.Resource
 import org.fusesource.scalate.{DefaultRenderContext, Template, TemplateEngine}
 import java.io.{StringWriter, PrintWriter}
 import nl.flotsam.monkeyman.util.Closeables._
 import org.apache.commons.io.{FilenameUtils, IOUtils}
+import nl.flotsam.monkeyman.{LayoutResolver, Resource}
 
-class SnippetDecoration(resource: Resource, template: Template, engine: TemplateEngine, allResources: () => Seq[Resource])
+class SnippetDecoration(resource: Resource, layoutResolver: LayoutResolver, engine: TemplateEngine, allResources: () => Seq[Resource])
   extends ResourceDecoration(resource) 
 {
 
@@ -43,7 +43,7 @@ class SnippetDecoration(resource: Resource, template: Template, engine: Template
         context.attributes("title") = title
         context.attributes("tags") = tags
         context.attributes("allResources") = allResources()
-        template.render(context)
+        layoutResolver.resolve(path).render(context)
         IOUtils.toInputStream(writer.getBuffer, "UTF-8")
     }
 

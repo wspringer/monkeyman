@@ -26,6 +26,7 @@ import com.sun.net.httpserver.{HttpServer, HttpExchange, HttpHandler}
 import java.util.concurrent.Executors
 import util.Logging
 import org.clapper.argot.ArgotConverters._
+import java.io.ByteArrayOutputStream
 
 
 object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
@@ -34,7 +35,7 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
 
   private val port = parser.option[Int](List("p", "port"), "PORT",
     "The port on which the server will be listening. Defaults to " + DEFAULT_PORT + ".")
-  
+
   def execute(config: MonkeymanConfiguration) {
     config.resourceLoader.load // Force all resources to be loaded
     val selectedPort = port.value.getOrElse(DEFAULT_PORT)
@@ -57,15 +58,23 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
           else path.substring(1)
         config.registryDecorator.resourceByPath.get(lookup) match {
           case Some(resource) =>
-            val responseHeaders = exchange.getResponseHeaders
-            responseHeaders.set("Content-Type", resource.contentType)
-            exchange.sendResponseHeaders(200, 0)
-            using(resource.open) {
-              in =>
-                using(exchange.getResponseBody) {
-                  out =>
-                    IOUtils.copy(in, out)
-                }
+            try {
+              using(new ByteArrayOutputStream) {
+                out =>
+                  using(resource.open) {
+                    in =>
+                      IOUtils.copy(in, out)
+                  }
+                  val buffer = out.toByteArray
+                  val responseHeaders = exchange.getResponseHeaders
+                  responseHeaders.set("Content-Type", resource.contentType)
+                  exchange.sendResponseHeaders(200, buffer.length)
+                  using(exchange.getResponseBody)(_.write(buffer))
+              }
+            } catch {
+              case t: Throwable =>
+                error("Failed to handle request", t)
+                sendStatus(500, "Failed to handle request", exchange)
             }
           case None =>
             sendStatus(404, "Not found", exchange)
@@ -79,9 +88,11 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
   private def sendStatus(status: Int, message: String, exchange: HttpExchange) {
     val responseHeaders = exchange.getResponseHeaders
     responseHeaders.set("Content-Type", "text/plain")
-    exchange.sendResponseHeaders(status, 0)
+    exchange.sendResponseHeaders(status, message.getBytes("UTF-8").length)
     using(exchange.getResponseBody) {
-      out => out.write(message.getBytes("UTF-8"))
+      out =>
+        out.write(message.getBytes("UTF-8"))
+        out.flush()
     }
   }
 

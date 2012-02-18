@@ -30,14 +30,24 @@ import decorator.zuss.ZussDecorator
 import java.io.File
 import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Binding, Template, TemplateEngine}
+import org.fusesource.scalate.util.{ResourceLoader => ScalateResourceLoader}
 import org.fusesource.scalate.support.URLTemplateSource
 
 case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
   private val layoutFileName = "layout"
 
+  private val sourceDirectories = List(layoutDir, sourceDir)
+
   private val templateEngine =
-    new TemplateEngine(List(layoutDir, sourceDir))
+    new TemplateEngine(sourceDirectories)
+
+  private val defaultLoader = templateEngine.resourceLoader
+  templateEngine.resourceLoader = new ScalateResourceLoader() {
+    def resource(uri: String) =
+      if (uri == "__default.scaml") Some(new URLTemplateSource(getClass.getResource("/layout.scaml")))
+      else defaultLoader.resource(uri)
+  }
 
   private val fileSystemResourceLoader =
     new FileSystemResourceLoader(sourceDir)
@@ -89,18 +99,15 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
   resourceLoader.register(registryDecorator)
 
-  private def tryLoadTemplate(dir: File): Option[Template] = {
+  private def tryLoadTemplate(dir: File): Template = {
     val files =
       TemplateEngine.templateTypes.view.map(ext => new File(dir, layoutFileName + "." + ext))
     files.find(_.exists()) match {
-      case Some(file) =>
-        Some(templateEngine.load(file))
+      case Some(file) => templateEngine.load(file)
       case None =>
         if (dir != layoutDir) tryLoadTemplate(dir.getParentFile)
         else {
-          // Loading the default template
-          val resource = getClass.getResource("/layout.scaml")
-          Some(templateEngine.load(new URLTemplateSource(resource)))
+          templateEngine.load("__default.scaml")
         }
     }
 
