@@ -30,6 +30,7 @@ import decorator.zuss.ZussDecorator
 import java.io.File
 import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Binding, Template, TemplateEngine}
+import org.fusesource.scalate.support.URLTemplateSource
 
 case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
@@ -96,7 +97,11 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
         Some(templateEngine.load(file))
       case None =>
         if (dir != layoutDir) tryLoadTemplate(dir.getParentFile)
-        else None
+        else {
+          // Loading the default template
+          val resource = getClass.getResource("/layout.scaml")
+          Some(templateEngine.load(new URLTemplateSource(resource)))
+        }
     }
 
   }

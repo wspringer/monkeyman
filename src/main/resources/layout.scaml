@@ -1,0 +1,9 @@
+!!!html
+%html
+  %head
+    - if (title.isDefined)
+      %title= title.get
+  %body
+    - if (title.isDefined)
+      %h1= title.get
+    - unescape(body)
