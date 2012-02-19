@@ -37,7 +37,7 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
     "The port on which the server will be listening. Defaults to " + DEFAULT_PORT + ".")
 
   def execute(config: MonkeymanConfiguration) {
-    config.resourceLoader.load // Force all resources to be loaded
+    val all = config.resourceLoader.load // Force all resources to be loaded
     val selectedPort = port.value.getOrElse(DEFAULT_PORT)
     val address = new InetSocketAddress(selectedPort)
     val server = HttpServer.create(address, 0)
@@ -58,6 +58,7 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
           else path.substring(1)
         config.registryDecorator.resourceByPath.get(lookup) match {
           case Some(resource) =>
+            info("Found")
             try {
               using(new ByteArrayOutputStream) {
                 out =>
@@ -69,6 +70,7 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
                   val responseHeaders = exchange.getResponseHeaders
                   responseHeaders.set("Content-Type", resource.contentType)
                   exchange.sendResponseHeaders(200, buffer.length)
+                  info("Sending response")
                   using(exchange.getResponseBody)(_.write(buffer))
               }
             } catch {

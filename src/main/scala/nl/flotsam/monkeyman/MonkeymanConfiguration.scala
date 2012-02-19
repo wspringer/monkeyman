@@ -60,7 +60,7 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
   def dispose {
     fileSystemResourceLoader.dispose
   }
-  
+
   val registryDecorator = new RegistryDecorator
 
   templateEngine.importStatements = "import nl.flotsam.monkeyman.scalate.Imports._" ::
@@ -86,7 +86,8 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
 
   val resourceLoader =
-    new DecoratingResourceLoader(fileSystemResourceLoader,
+    new DecoratingResourceLoader(
+      new ClasspathResourceLoader(Seq("monkeyman/logo.png"), fileSystemResourceLoader),
       new LessDecorator,
       new ZussDecorator,
       new YamlFrontmatterDecorator(),
@@ -95,7 +96,7 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
       new ScalateDecorator(templateEngine, registryDecorator.allResources _),
       PermalinkDecorator,
       registryDecorator
-  )
+    )
 
   resourceLoader.register(registryDecorator)
 
