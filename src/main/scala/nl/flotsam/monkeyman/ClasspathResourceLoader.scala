@@ -19,7 +19,6 @@
 
 package nl.flotsam.monkeyman
 
-import eu.medsea.mimeutil.{MimeType, MimeUtil}
 import org.joda.time.LocalDateTime
 import collection.JavaConversions._
 import eu.medsea.mimeutil.detector.ExtensionMimeDetector

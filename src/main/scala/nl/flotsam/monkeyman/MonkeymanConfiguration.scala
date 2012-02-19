@@ -22,7 +22,6 @@ package nl.flotsam.monkeyman
 import decorator.less.LessDecorator
 import decorator.markdown.MarkdownDecorator
 import decorator.permalink.PermalinkDecorator
-import decorator.registry.RegistryDecorator
 import decorator.scalate.ScalateDecorator
 import decorator.snippet.SnippetDecorator
 import decorator.yaml.YamlFrontmatterDecorator
@@ -61,8 +60,6 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
     fileSystemResourceLoader.dispose
   }
 
-  val registryDecorator = new RegistryDecorator
-
   templateEngine.importStatements = "import nl.flotsam.monkeyman.scalate.Imports._" ::
     templateEngine.importStatements
 
@@ -85,21 +82,22 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
   ) :: templateEngine.bindings
 
 
-  val resourceLoader =
-    new DecoratingResourceLoader(
-      new ClasspathResourceLoader(Seq("monkeyman/logo.png"), fileSystemResourceLoader),
-      new LessDecorator,
-      new ZussDecorator,
-      new YamlFrontmatterDecorator(),
-      new MarkdownDecorator(),
-      new SnippetDecorator(layoutResolver, templateEngine, registryDecorator.allResources _),
-      new ScalateDecorator(templateEngine, registryDecorator.allResources _),
-      PermalinkDecorator,
-      registryDecorator
+  val registry =
+    new Registry(
+      new DecoratingResourceLoader(
+        new ClasspathResourceLoader(Seq("favicon.ico", "monkeyman/logo.png"), fileSystemResourceLoader),
+        new LessDecorator,
+        new ZussDecorator,
+        new YamlFrontmatterDecorator(),
+        new MarkdownDecorator(),
+        new SnippetDecorator(layoutResolver, templateEngine, allResources _),
+        new ScalateDecorator(templateEngine, allResources _),
+        PermalinkDecorator
+      )
     )
 
-  resourceLoader.register(registryDecorator)
-
+  def allResources: List[Resource] = registry.allResources
+  
   private def tryLoadTemplate(dir: File): Template = {
     val files =
       TemplateEngine.templateTypes.view.map(ext => new File(dir, layoutFileName + "." + ext))
