@@ -58,7 +58,6 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
           else path.substring(1)
         config.registryDecorator.resourceByPath.get(lookup) match {
           case Some(resource) =>
-            info("Found")
             try {
               using(new ByteArrayOutputStream) {
                 out =>
@@ -70,7 +69,6 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
                   val responseHeaders = exchange.getResponseHeaders
                   responseHeaders.set("Content-Type", resource.contentType)
                   exchange.sendResponseHeaders(200, buffer.length)
-                  info("Sending response")
                   using(exchange.getResponseBody)(_.write(buffer))
               }
             } catch {
