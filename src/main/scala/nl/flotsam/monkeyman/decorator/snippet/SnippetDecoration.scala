@@ -42,6 +42,7 @@ class SnippetDecoration(resource: Resource, layoutResolver: LayoutResolver, engi
         context.attributes("body") = IOUtils.toString(in, "UTF-8")
         context.attributes("title") = title
         context.attributes("tags") = tags
+        context.attributes("pubDateTime") = pubDateTime
         context.attributes("allResources") = allResources()
         layoutResolver.resolve(path).render(context)
         IOUtils.toInputStream(writer.getBuffer, "UTF-8")

@@ -31,6 +31,7 @@ import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Binding, Template, TemplateEngine}
 import org.fusesource.scalate.util.{ResourceLoader => ScalateResourceLoader}
 import org.fusesource.scalate.support.URLTemplateSource
+import org.joda.time.LocalDateTime
 
 case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 
@@ -61,6 +62,7 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
   }
 
   templateEngine.importStatements = "import nl.flotsam.monkeyman.scalate.Imports._" ::
+    "import org.joda.time.LocalDateTime" ::
     templateEngine.importStatements
 
   templateEngine.bindings = new Binding(
@@ -79,6 +81,10 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
     name = "tags",
     className = "Set[String]",
     defaultValue = Some("Set.empty[String]")
+  ) :: new Binding(
+    name = "pubDateTime",
+    className = "org.joda.time.LocalDateTime",
+    defaultValue = Some("LocalDateTime.now")
   ) :: templateEngine.bindings
 
 
