@@ -31,7 +31,6 @@ import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Binding, Template, TemplateEngine}
 import org.fusesource.scalate.util.{ResourceLoader => ScalateResourceLoader}
 import org.fusesource.scalate.support.URLTemplateSource
-import org.joda.time.LocalDateTime
 
 case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
 

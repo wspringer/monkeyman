@@ -27,16 +27,16 @@ case class Registry(loader: ResourceLoader)
 {
 
   val allResources = loader.load.toList
-  private val resourcesById = collection.mutable.Map(allResources.map(resource => resource.id -> resource): _*)
+  private val resourceById = collection.mutable.Map(allResources.map(resource => resource.id -> resource): _*)
   val resourceByPath = collection.mutable.Map(allResources.map(resource => resource.path -> resource): _*)
 
   loader.register(this)
 
   def deleted(id: String) {
-    resourcesById.get(id) match {
+    resourceById.get(id) match {
       case Some(resource) =>
-        info("Removed {}", resource.path)
-        resourcesById -= id
+        info("Removed {}", resource.id)
+        resourceById -= id
         resourceByPath -= resource.path
       case None =>
       // TODO: Add warning here
@@ -44,14 +44,18 @@ case class Registry(loader: ResourceLoader)
   }
 
   def added(resource: Resource) {
-    info("Added {}", resource.path)
-    resourcesById += resource.id -> resource
+    info("Added {}", resource.id)
+    resourceById += resource.id -> resource
     resourceByPath += resource.path -> resource
   }
 
   def modified(resource: Resource) {
-    info("Modified {}", resource.path)
-    resourcesById += resource.id -> resource
+    info("Modified {}", resource.id)
+    resourceById.get(resource.id).map(previous => if (previous.path != resource.path) {
+      info("Changing path of {} to {}", previous.id, resource.path)
+      resourceByPath -= previous.path
+    })
+    resourceById += resource.id -> resource
     resourceByPath += resource.path -> resource
   }
 
