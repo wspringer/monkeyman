@@ -44,7 +44,19 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
     server.setExecutor(Executors.newCachedThreadPool())
     server.start()
     info("The Monkeyman is standing watch on port {}", selectedPort)
-    while (true) Thread.sleep(1000)
+    def doWait() {
+      try {
+        Thread.sleep(1000)
+      } catch {
+        case _: InterruptedException => ()
+      }
+      if (System.in.available() <= 0)
+        doWait()
+    }
+    doWait()
+    info("The Monkeyman is standing down")
+    config.dispose
+    server.stop(0)
   }
 
   class MonkeymanHandler(config: MonkeymanConfiguration) extends HttpHandler {

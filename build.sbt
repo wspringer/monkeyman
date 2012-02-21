@@ -45,3 +45,5 @@ mainClass in assembly := Some("nl.flotsam.monkeyman.Monkeyman")
 jarName in assembly := "monkeyman.jar"
 
 fork in run := true
+
+connectInput in run := true
