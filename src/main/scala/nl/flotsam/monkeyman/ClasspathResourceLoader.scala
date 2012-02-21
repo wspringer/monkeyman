@@ -28,10 +28,32 @@ class ClasspathResourceLoader(paths: Seq[String], loader: ResourceLoader) extend
   
   private val resources = paths.map(path => ClasspathResource(path))
   
-  def load = resources ++ loader.load
+  def load = {
+    val loaded = loader.load
+    val ids = loaded.map(_.id)
+    resources.filter(resource => !ids.contains(resource.id)) ++ loaded
+  } 
 
   def register(listener: ResourceListener) {
-    loader.register(listener)
+    loader.register(new ResourceListener {
+      def deleted(id: String) {
+        resources.find(_.id == id) match {
+          case Some(resource) => listener.modified(resource)
+          case None => listener.deleted(id)
+        }
+      }
+
+      def modified(resource: Resource) {
+        listener.modified(resource)
+      }
+
+      def added(resource: Resource) {
+        resources.find(_.id == resource.id) match {
+          case Some(resource) => listener.modified(resource)
+          case None => listener.added(resource)
+        }
+      }
+    })
   }
   
   case class ClasspathResource(path: String) extends Resource {
@@ -54,5 +76,5 @@ class ClasspathResourceLoader(paths: Seq[String], loader: ResourceLoader) extend
 
     def id = path
   }
-  
+
 }
