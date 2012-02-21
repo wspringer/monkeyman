@@ -17,24 +17,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman.decorator.less
+package nl.flotsam.monkeyman
 
-import nl.flotsam.monkeyman.decorator.ResourceDecoration
-import com.asual.lesscss.LessEngine
-import org.apache.commons.io.{IOUtils, FilenameUtils}
-import java.net.URL
-import nl.flotsam.monkeyman.Resource
+import org.joda.time.LocalDateTime
+import eu.medsea.mimeutil.{MimeType, MimeUtil}
+import collection.JavaConversions._
 
-class LessDecoration(engine: LessEngine, resource: Resource,  url: URL) extends ResourceDecoration(resource) {
+case class ClasspathResource(path: String) extends Resource {
 
-  override lazy val path = FilenameUtils.removeExtension(resource.path) + ".css"
+  val url = getClass.getResource("/" + path)
 
-  override def contentType = "text/css"
+  def title = None
 
-  override def open = {
-    // TODO: This thing behaves weird. It will just kill the thread in some cases, without an exception
-    val css = engine.compile(url)
-    IOUtils.toInputStream(css, "UTF-8")
-  }
+  def pubDateTime = LocalDateTime.now()
+
+  def contentType = MimeUtil.getMimeTypes(url).asInstanceOf[java.util.Set[MimeType]].head.toString
+
+  def open = url.openStream()
+
+  def tags = Set.empty
+
+  def published = true
+
+  def asHtmlFragment = None
+
+  def id = path
 
 }

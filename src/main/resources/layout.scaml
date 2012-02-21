@@ -1,9 +1,18 @@
+- val dateFormat = org.joda.time.format.DateTimeFormat.forPattern("EEEE d MMMM")
 !!!html
 %html
   %head
+    -# Don't get it
     - if (title.isDefined)
       %title= title.get
+    %link(rel="stylesheet" href="monkeyman/monkeyman.css" type="text/css")
   %body
-    - if (title.isDefined)
-      %h1= title.get
-    - unescape(body)
+    #main
+      #header
+        %h1= title.getOrElse("No title")
+        #subtitle= dateFormat.print(pubDateTime)
+      .hr
+      #body
+        - unescape(body)
+
+    

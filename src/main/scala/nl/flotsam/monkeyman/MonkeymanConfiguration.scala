@@ -90,7 +90,7 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
   val registry =
     new Registry(
       new DecoratingResourceLoader(
-        new ClasspathResourceLoader(Seq("favicon.ico", "monkeyman/logo.png"), fileSystemResourceLoader),
+        new ClasspathResourceLoader(Seq("favicon.ico", "monkeyman/logo.png", "monkeyman/monkeyman.less"), fileSystemResourceLoader),
         new LessDecorator,
         new ZussDecorator,
         new YamlFrontmatterDecorator(),
