@@ -29,12 +29,7 @@ class SnippetDecorator(layoutResolver: LayoutResolver, engine: TemplateEngine, a
 
   def decorate(resource: Resource) =
     if (resource.contentType == "text/x-html-fragment")
-      layoutResolver.resolve(resource.path) match {
-        case Some(template) =>
-          new SnippetDecoration(resource, template, engine, allResources)
-        case _ =>
-          resource
-      } 
+      new SnippetDecoration(resource, layoutResolver, engine, allResources)
     else resource
 
 }

@@ -25,7 +25,7 @@ import com.ibm.icu.text.Transliterator
 import org.apache.commons.io.FilenameUtils._
 import annotation.tailrec
 
-class PermalinkDecoration(resource: Resource) extends ResourceDecoration(resource) {
+case class PermalinkDecoration(resource: Resource) extends ResourceDecoration(resource) {
 
   override def path =
     resource.title.map {

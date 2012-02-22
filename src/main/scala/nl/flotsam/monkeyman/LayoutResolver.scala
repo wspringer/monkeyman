@@ -23,6 +23,6 @@ import org.fusesource.scalate.Template
 
 trait LayoutResolver {
 
-  def resolve(path: String): Option[Template]
+  def resolve(path: String): Template
 
 }

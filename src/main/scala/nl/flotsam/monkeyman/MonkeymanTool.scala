@@ -22,8 +22,11 @@ package nl.flotsam.monkeyman
 import org.clapper.argot.ArgotConverters._
 import java.io.File
 import org.clapper.argot.{ArgotUsageException, ArgotParser}
+import eu.medsea.mimeutil.{MimeType, MimeUtil}
 
 abstract class MonkeymanTool(toolName: String) {
+
+  MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.ExtensionMimeDetector")
 
   val workingDir = new File(System.getProperty("user.dir"))
 

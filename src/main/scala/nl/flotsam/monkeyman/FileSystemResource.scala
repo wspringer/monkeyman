@@ -27,6 +27,8 @@ import org.joda.time.LocalDateTime
 
 case class FileSystemResource(baseDir: File, path: String) extends Resource {
 
+  lazy val url = file.toURI.toURL
+
   lazy val file = new File(baseDir, path)
 
   lazy val title = None

@@ -20,11 +20,12 @@
 package nl.flotsam.monkeyman.decorator.less
 
 import nl.flotsam.monkeyman.decorator.ResourceDecoration
-import nl.flotsam.monkeyman.FileSystemResource
 import com.asual.lesscss.LessEngine
 import org.apache.commons.io.{IOUtils, FilenameUtils}
+import java.net.URL
+import nl.flotsam.monkeyman.Resource
 
-class LessDecoration(engine: LessEngine, resource: FileSystemResource) extends ResourceDecoration(resource) {
+class LessDecoration(engine: LessEngine, resource: Resource,  url: URL) extends ResourceDecoration(resource) {
 
   override lazy val path = FilenameUtils.removeExtension(resource.path) + ".css"
 
@@ -32,7 +33,7 @@ class LessDecoration(engine: LessEngine, resource: FileSystemResource) extends R
 
   override def open = {
     // TODO: This thing behaves weird. It will just kill the thread in some cases, without an exception
-    val css = engine.compile(resource.file)
+    val css = engine.compile(url)
     IOUtils.toInputStream(css, "UTF-8")
   }
 

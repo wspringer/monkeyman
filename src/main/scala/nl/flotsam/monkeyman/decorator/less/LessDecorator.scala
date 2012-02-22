@@ -19,8 +19,8 @@
 
 package nl.flotsam.monkeyman.decorator.less
 
-import nl.flotsam.monkeyman.{FileSystemResource, Resource, ResourceDecorator}
 import com.asual.lesscss.LessEngine
+import nl.flotsam.monkeyman.{ClasspathResource, FileSystemResource, Resource, ResourceDecorator}
 
 
 class LessDecorator extends ResourceDecorator {
@@ -28,8 +28,10 @@ class LessDecorator extends ResourceDecorator {
   val engine = new LessEngine()
 
   def decorate(resource: Resource) = resource match {
-    case fileSystemResource: FileSystemResource if fileSystemResource.file.getName.endsWith(".less") =>
-      new LessDecoration(engine, fileSystemResource)
+    case fileSystemResource: FileSystemResource if fileSystemResource.path.endsWith(".less") =>
+      new LessDecoration(engine, fileSystemResource, fileSystemResource.url)
+    case classpathResource: ClasspathResource if classpathResource.path.endsWith(".less") =>
+      new LessDecoration(engine, classpathResource, classpathResource.url)
     case _ =>
       resource
   }

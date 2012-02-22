@@ -17,19 +17,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman.util
+package nl.flotsam.monkeyman
 
-import org.slf4j.LoggerFactory
+import org.joda.time.LocalDateTime
+import eu.medsea.mimeutil.{MimeType, MimeUtil}
+import collection.JavaConversions._
 
-trait Logging {
+case class ClasspathResource(path: String) extends Resource {
 
-  lazy val logger = LoggerFactory.getLogger(getClass)
+  val url = getClass.getResource("/" + path)
 
-  def debug(message: => String, args: Any*) = logger.debug(message, args.toArray.map(_.asInstanceOf[AnyRef]).toArray[AnyRef])
-  def info(message: => String, args: Any*)  = logger.info(message, args.map(_.asInstanceOf[AnyRef]).toArray[AnyRef])
-  def warn(message: => String, args: Any*)  = logger.warn(message, args.map(_.asInstanceOf[AnyRef]).toArray[AnyRef])
-  def warn(message: => String, e: Throwable)  = logger.warn(message, e)
-  def error(message: => String) = logger.error(message)
-  def error(message: => String, e : Throwable) = logger.error(message,e)
+  def title = None
+
+  def pubDateTime = LocalDateTime.now()
+
+  def contentType = MimeUtil.getMimeTypes(url).asInstanceOf[java.util.Set[MimeType]].head.toString
+
+  def open = url.openStream()
+
+  def tags = Set.empty
+
+  def published = true
+
+  def asHtmlFragment = None
+
+  def id = path
 
 }

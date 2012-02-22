@@ -31,7 +31,7 @@ object MonkeymanGenerator extends MonkeymanTool("monkeyman generate") with Loggi
 
   def execute(config: MonkeymanConfiguration) {
     if (list.value == Some(true))
-      println(config.resourceLoader.load.map {
+      println(config.registry.allResources.map {
         resource =>
           resource.contentType + " " + resource.path
       }.mkString("\n"))
@@ -40,7 +40,7 @@ object MonkeymanGenerator extends MonkeymanTool("monkeyman generate") with Loggi
 
   private def generate(config: MonkeymanConfiguration, targetDir: File) {
     targetDir.mkdirs()
-    for (resource <- config.resourceLoader.load) {
+    for (resource <- config.registry.allResources) {
       val targetFile = new File(targetDir, resource.path)
       using(resource.open) {
         info("Generating {}", resource.path)
