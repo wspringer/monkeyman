@@ -22,20 +22,26 @@ created if there _would_ have been a solution that supports:
 If ever such a solution arrives, then there is a chance Monkeyman will
 no longer be maintained.
 
-## Other features
+## Features
 
-* Jade, HAML (SCAML), SSP support (through Scalate)
-* ZUSS support (Java alternative for LESS/SCSS)
+* Jade, HAML (SCAML), Mustache, SSP for layouts
+* LESS and ZUSS to CSS transformation
+* Live preview (web server running on port 4567)
+* Live updates (monitoring file system changes)
+* Static web site generation
+* Content management through tags
 
 ## Usage
 
 For information on how to _use_ Monkeyman, check the [sample blog]
-(http://monkeyman.flotsam.nl/). 
+(http://monkeyman.flotsam.nl/), or watch
+[the video](http://www.youtube.com/watch?v=9giYvVGIi0U).
 
 But basically, it boils down to this:
 
-* Create a `source` directory; store HAML, Jade, SSP, Markdown files
-  with YAML frontmatter and other static resources in that directory.
+* Create a `source` directory; store HAML, Jade, SSP, Markdown,
+  Mustache files with YAML frontmatter and other static resources in
+  that directory.
 * Create a `layout` directory; store HAML, Jade or SSP layouts in that
   directory. 
 * Have a web server pick up all of the changes you are making,
@@ -43,10 +49,26 @@ But basically, it boils down to this:
 * Build your final version in the `target` directory, by typing
   `middleman generate`. 
 
+## Installation
+
+Download the monkeyman jar from the Downloads section. Start it with
+`java -jar monkeyman.jar`, or create a script for it, as I did:
+
+    #!/bin/sh
+    
+    java -jar ~/workspace/monkeyman/target/monkeyman.jar "$@"
+
 ## Changes
+
+0.2
+
+* 2012-02-20: Default site template (no need to start creating a layout)
+* 2012-02-18: File system monitoring (detect changes and update content when required)
 
 0.1
 
 * 2012-02-14: Add LESS support.
 * 2012-02-13: Add live preview support.
+
+
 
