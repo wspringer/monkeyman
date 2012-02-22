@@ -35,7 +35,7 @@ case class Registry(loader: ResourceLoader)
   def deleted(id: String) {
     resourceById.get(id) match {
       case Some(resource) =>
-        info("Removed {}", resource.id)
+        info("Removed {} ({})", resource.id, resource.path)
         resourceById -= id
         resourceByPath -= resource.path
       case None =>
@@ -44,13 +44,13 @@ case class Registry(loader: ResourceLoader)
   }
 
   def added(resource: Resource) {
-    info("Added {}", resource.id)
+    info("Added {} ({})", resource.id, resource.path)
     resourceById += resource.id -> resource
     resourceByPath += resource.path -> resource
   }
 
   def modified(resource: Resource) {
-    info("Modified {}", resource.id)
+    info("Modified {} ({})", resource.id, resource.path)
     resourceById.get(resource.id).map(previous => if (previous.path != resource.path) {
       info("Changing path of {} to {}", previous.id, resource.path)
       resourceByPath -= previous.path
