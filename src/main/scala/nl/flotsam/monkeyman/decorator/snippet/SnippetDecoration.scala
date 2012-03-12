@@ -39,6 +39,7 @@ class SnippetDecoration(resource: Resource, layoutResolver: LayoutResolver, engi
       in =>
         val writer = new StringWriter
         val context = new DefaultRenderContext(path, engine, new PrintWriter(writer))
+        context.attributes("id") = id
         context.attributes("body") = IOUtils.toString(in, "UTF-8")
         context.attributes("title") = title
         context.attributes("tags") = tags

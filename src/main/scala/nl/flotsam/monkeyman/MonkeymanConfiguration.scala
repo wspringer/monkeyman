@@ -84,7 +84,11 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
     name = "pubDateTime",
     className = "org.joda.time.LocalDateTime",
     defaultValue = Some("LocalDateTime.now")
-  ) :: templateEngine.bindings
+  ) :: new Binding(
+    name = "id",
+    className = "String",
+    defaultValue = None
+  ):: templateEngine.bindings
 
 
   val registry =
