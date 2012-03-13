@@ -73,6 +73,14 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
     className = "Option[String]",
     defaultValue = Some("None")
   ) :: new Binding(
+    name = "subtitle",
+    className = "Option[String]",
+    defaultValue = Some("None")
+  ) :: new Binding(
+    name = "summary",
+    className = "Option[String]",
+    defaultValue = Some("None")
+  ) :: new Binding(
     name = "body",
     className = "String",
     defaultValue = Some(""""No body"""")

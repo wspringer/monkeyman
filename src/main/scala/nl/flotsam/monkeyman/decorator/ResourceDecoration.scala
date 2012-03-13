@@ -25,6 +25,10 @@ class ResourceDecoration(resource: Resource) extends Resource {
 
   def title = resource.title
 
+  def subtitle = resource.subtitle
+
+  def summary = resource.summary
+
   def pubDateTime = resource.pubDateTime
 
   def contentType = resource.contentType

@@ -42,6 +42,8 @@ class SnippetDecoration(resource: Resource, layoutResolver: LayoutResolver, engi
         context.attributes("id") = id
         context.attributes("body") = IOUtils.toString(in, "UTF-8")
         context.attributes("title") = title
+        context.attributes("subtitle") = subtitle
+        context.attributes("summary") = summary
         context.attributes("tags") = tags
         context.attributes("pubDateTime") = pubDateTime
         context.attributes("allResources") = allResources()

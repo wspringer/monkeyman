@@ -18,7 +18,8 @@ libraryDependencies ++= Seq(
   "com.ibm.icu" % "icu4j" % "4.8.1.1",
   "ch.qos.logback" % "logback-core" % "1.0.0",
   "ch.qos.logback" % "logback-classic" % "1.0.0",
-  "com.asual.lesscss" % "lesscss-engine" % "1.1.5"
+  "com.asual.lesscss" % "lesscss-engine" % "1.1.5",
+  "org.yaml" % "snakeyaml" % "1.10"
 )
 
 resolvers ++= Seq(

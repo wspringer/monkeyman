@@ -33,6 +33,10 @@ case class FileSystemResource(baseDir: File, path: String) extends Resource {
 
   lazy val title = None
 
+  val subtitle = None
+
+  val summary = None
+
   lazy val pubDateTime = new LocalDateTime(file.lastModified())
 
   lazy val contentType = MimeUtil.getMimeTypes(file).asInstanceOf[java.util.Set[MimeType]].head.toString

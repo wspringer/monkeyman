@@ -27,6 +27,8 @@ import nl.flotsam.monkeyman.decorator.ResourceDecoration
 import nl.flotsam.monkeyman.util.Logging
 import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
 import org.joda.time.LocalDateTime
+import org.yaml.snakeyaml.Yaml
+import collection.JavaConversions._
 
 /**
  * Mimics YAML front matter extraction. Not really YAML, but who cares?
@@ -59,6 +61,10 @@ class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(r
     title.orElse(resource.title)
   }
 
+  override def subtitle = attributes.get("subtitle").orElse(resource.title)
+
+  override def summary = attributes.get("summary").orElse(resource.summary)
+
   override def published = attributes.get("published").flatMap(str => allCatch.opt(str.toBoolean)).getOrElse(resource.published)
 
   override def tags =
@@ -84,12 +90,9 @@ class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(r
     lines.headOption match {
       case Some(line) if line.trim == "---" =>
         val (settings, remainder) = lines.tail.span(_ != "---")
-        val attributes = (for {
-          setting <- settings
-          (key, value) = setting.span(_ != ':')
-        } yield {
-          (key.trim, value.tail.trim)
-        }).toMap
+        val yaml = new Yaml
+        val attributes =
+          yaml.loadAs[java.util.Map[String, String]](settings.mkString("\n"), classOf[java.util.Map[String,String]]).toMap
         (attributes, Some(remainder.tail.mkString("\n")))
       case _ =>
         (Map.empty, None)

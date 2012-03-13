@@ -30,6 +30,16 @@ trait Resource {
   def title: Option[String]
 
   /**
+   * The subtitle of this resource.
+   */
+  def subtitle: Option[String]
+  
+  /**
+   * A summary of this snippet of this resource.
+   */
+  def summary: Option[String]
+
+  /**
    * The date from which on this file should be considered published. (Note: that doesn't mean it will stay there
    * forever, it just allows you to hold off publication if you don't want to and have a publication date if that's
    * what you want to display.

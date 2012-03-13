@@ -27,20 +27,24 @@ case class ClasspathResource(path: String) extends Resource {
 
   val url = getClass.getResource("/" + path)
 
-  def title = None
+  val title = None
 
-  def pubDateTime = LocalDateTime.now()
+  def subtitle = None
 
-  def contentType = MimeUtil.getMimeTypes(url).asInstanceOf[java.util.Set[MimeType]].head.toString
+  def summary = None
 
-  def open = url.openStream()
+  val pubDateTime = LocalDateTime.now()
+
+  val contentType = MimeUtil.getMimeTypes(url).asInstanceOf[java.util.Set[MimeType]].head.toString
+
+  val open = url.openStream()
 
   def tags = Set.empty
 
-  def published = true
+  val published = true
 
-  def asHtmlFragment = None
+  val asHtmlFragment = None
 
-  def id = path
+  val id = path
 
 }
