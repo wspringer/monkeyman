@@ -29,6 +29,7 @@ import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
 import org.joda.time.LocalDateTime
 import org.yaml.snakeyaml.Yaml
 import collection.JavaConversions._
+import java.util.Date
 
 /**
  * Mimics YAML front matter extraction. Not really YAML, but who cares?
@@ -57,25 +58,22 @@ class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(r
   }
 
   override def title = {
-    val title = attributes.get("title")
+    val title = attributes.get("title").map(_.asInstanceOf[String])
     title.orElse(resource.title)
   }
 
-  override def subtitle = attributes.get("subtitle").orElse(resource.title)
+  override def subtitle = attributes.get("subtitle").map(_.asInstanceOf[String]).orElse(resource.title)
 
-  override def summary = attributes.get("summary").orElse(resource.summary)
+  override def summary = attributes.get("summary").map(_.asInstanceOf[String]).orElse(resource.summary)
 
-  override def published = attributes.get("published").flatMap(str => allCatch.opt(str.toBoolean)).getOrElse(resource.published)
+  override def published = attributes.get("published").map(_.asInstanceOf[Boolean]).getOrElse(resource.published)
 
   override def tags =
-    resource.tags ++ attributes.get("tags").map(_.split(",").map(_.trim)).getOrElse(Array.empty)
+    resource.tags ++ attributes.get("tags").map(_.asInstanceOf[String].split(",").map(_.trim)).getOrElse(Array.empty)
 
-  override def pubDateTime = attributes.get("pubDateTime") match {
-    case Some(str) =>
-      parse(str).getOrElse {
-        warn("Failed to parse pubDateTime in %s".format(resource.path))
-        resource.pubDateTime
-      }
+  override def pubDateTime = attributes.get("pubDateTime").map(_.asInstanceOf[Date]) match {
+    case Some(date) =>
+      LocalDateTime.fromDateFields(date)
     case None =>
       resource.pubDateTime
   }
@@ -85,14 +83,14 @@ class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(r
     else resource.open
   }
 
-  private def extractAttributes(str: String): (Map[String, String], Option[String]) = {
+  private def extractAttributes(str: String): (Map[String, Any], Option[String]) = {
     val lines = str.lines.toList
     lines.headOption match {
       case Some(line) if line.trim == "---" =>
         val (settings, remainder) = lines.tail.span(_ != "---")
         val yaml = new Yaml
         val attributes =
-          yaml.loadAs[java.util.Map[String, String]](settings.mkString("\n"), classOf[java.util.Map[String,String]]).toMap
+          yaml.loadAs[java.util.Map[String, Any]](settings.mkString("\n"), classOf[java.util.Map[String,Any]]).toMap
         (attributes, Some(remainder.tail.mkString("\n")))
       case _ =>
         (Map.empty, None)
