@@ -40,7 +40,7 @@ class ScalateDecoration(resource: Resource, template: Template, engine: Template
     context.attributes("allResources") = allResources()
     context.attributes("id") = id
     template.render(context)
-    IOUtils.toInputStream(writer.toString)
+    IOUtils.toInputStream(writer.toString, "UTF-8")
   }
 
 }
