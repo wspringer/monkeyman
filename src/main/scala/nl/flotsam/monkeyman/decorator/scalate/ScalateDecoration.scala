@@ -39,7 +39,7 @@ class ScalateDecoration(resource: Resource, template: Template, engine: Template
     val context = new DefaultRenderContext(path, engine, new PrintWriter(writer))
     context.attributes("allResources") = allResources()
     context.attributes("id") = id
-    template.render(context)
+    engine.layout(template, context)
     IOUtils.toInputStream(writer.toString, "UTF-8")
   }
 
