@@ -25,9 +25,10 @@ import nl.flotsam.monkeyman.util.Closeables._
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.pegdown.ast.{TextNode, HeaderNode}
 import org.pegdown.{LinkRenderer, ToHtmlSerializer, PegDownProcessor}
+import nl.flotsam.monkeyman.util.Logging
 
 case class MarkdownDecoration(resource: Resource)
-  extends ResourceDecoration(resource) {
+  extends ResourceDecoration(resource) with Logging {
 
   lazy val (extractedTitle, html) = {
     using(resource.open) {
@@ -48,7 +49,7 @@ case class MarkdownDecoration(resource: Resource)
 
   override lazy val path = FilenameUtils.removeExtension(resource.path) + ".frag"
 
-  override def open = IOUtils.toInputStream(html)
+  override def open = IOUtils.toInputStream(html, "UTF-8")
 
   override def asHtmlFragment = Some(html)
 

@@ -35,9 +35,9 @@ mainClass in (Compile, run) := Some("nl.flotsam.monkeyman.Monkeyman")
 
 mainClass in (Compile, packageBin) := Some("nl.flotsam.monkeyman.Monkeyman")
 
-seq(ProguardPlugin.proguardSettings :_*)
-
-proguardOptions ++= List(keepMain("nl.flotsam.monkeyman.Monkeyman"), "-keepclasseswithmembers class org.pegdown.**", "-keepclasseswithmembers class org.parboiled.**")
+//seq(ProguardPlugin.proguardSettings :_*)
+//
+//proguardOptions ++= List(keepMain("nl.flotsam.monkeyman.Monkeyman"), "-keepclasseswithmembers class org.pegdown.**", "-keepclasseswithmembers class org.parboiled.**")
 
 seq(assemblySettings: _*)
 
