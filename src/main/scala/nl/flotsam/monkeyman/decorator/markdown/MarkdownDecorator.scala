@@ -21,11 +21,11 @@ package nl.flotsam.monkeyman.decorator.markdown
 
 import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
 
-class MarkdownDecorator extends ResourceDecorator {
+class MarkdownDecorator(sections: Boolean) extends ResourceDecorator {
   
   def decorate(resource: Resource) = {
     if (resource.contentType == "text/x-web-markdown" || resource.path.endsWith(".md"))
-      new MarkdownDecoration(resource)
+      new MarkdownDecoration(resource, sections)
     else resource
   }
   

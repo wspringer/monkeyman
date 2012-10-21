@@ -23,11 +23,11 @@ import nl.flotsam.monkeyman.Resource
 import nl.flotsam.monkeyman.decorator.ResourceDecoration
 import nl.flotsam.monkeyman.util.Closeables._
 import org.apache.commons.io.{FilenameUtils, IOUtils}
-import org.pegdown.ast.{TextNode, HeaderNode}
+import org.pegdown.ast.{SimpleNode, TextNode, HeaderNode}
 import org.pegdown.{LinkRenderer, ToHtmlSerializer, PegDownProcessor}
 import nl.flotsam.monkeyman.util.Logging
 
-case class MarkdownDecoration(resource: Resource)
+case class MarkdownDecoration(resource: Resource, sections: Boolean)
   extends ResourceDecoration(resource) with Logging {
 
   lazy val (extractedTitle, html) = {
@@ -37,7 +37,9 @@ case class MarkdownDecoration(resource: Resource)
         val processor = new PegDownProcessor
         val rootNode = processor.parseMarkdown(markdown.toCharArray)
         val visitor = new TitleExtractingToHtmlSerializer(new LinkRenderer)
-        val html = visitor.toHtml(rootNode)
+        val html =
+          if (sections) "<section>" + visitor.toHtml(rootNode) + "</section>"
+          else visitor.toHtml(rootNode)
         val title = visitor.title
         (title, html)
     }
@@ -74,6 +76,16 @@ case class MarkdownDecoration(resource: Resource)
         super.visit(node)
       }
     }
+
+    override def visit(node: SimpleNode) {
+      node.getType match {
+        case SimpleNode.Type.HRule if (sections) =>
+          printer.println.print("</section><section>")
+        case _ => super.visit(node)
+      }
+    }
+
+
   }
 
 }

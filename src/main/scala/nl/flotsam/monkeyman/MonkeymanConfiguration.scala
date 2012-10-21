@@ -32,7 +32,7 @@ import org.fusesource.scalate.{Binding, Template, TemplateEngine}
 import org.fusesource.scalate.util.{ResourceLoader => ScalateResourceLoader}
 import org.fusesource.scalate.support.URLTemplateSource
 
-case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
+case class MonkeymanConfiguration(sourceDir: File, layoutDir: File, sections: Boolean = false) {
 
   private val layoutFileName = "layout"
 
@@ -106,7 +106,7 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File) {
         new LessDecorator,
         new ZussDecorator,
         new YamlFrontmatterDecorator(),
-        new MarkdownDecorator(),
+        new MarkdownDecorator(sections),
         new SnippetDecorator(layoutResolver, templateEngine, allResources _),
         new ScalateDecorator(templateEngine, allResources _),
         PermalinkDecorator
