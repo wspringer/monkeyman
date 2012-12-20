@@ -19,11 +19,6 @@
 
 package nl.flotsam.monkeyman
 
-import org.joda.time.LocalDateTime
-import collection.JavaConversions._
-import eu.medsea.mimeutil.detector.ExtensionMimeDetector
-import eu.medsea.mimeutil.{MimeType, MimeUtil}
-
 
 class ClasspathResourceLoader(paths: Seq[String], loader: ResourceLoader) extends ResourceLoader {
   
