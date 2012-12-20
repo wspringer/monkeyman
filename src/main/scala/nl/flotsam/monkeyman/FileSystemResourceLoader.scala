@@ -21,7 +21,6 @@ package nl.flotsam.monkeyman
 
 import org.apache.commons.io.FileUtils
 import nl.flotsam.monkeyman.ext.ResourceUtils
-import org.apache.commons.io.filefilter._
 import collection.mutable.Buffer
 import name.pachler.nio.file.StandardWatchEventKind._
 import java.io.{FileFilter, File}
@@ -29,7 +28,7 @@ import collection.JavaConversions
 import JavaConversions._
 import util.Logging
 import name.pachler.nio.file._
-import java.util.concurrent.{ExecutorService, Executors}
+import java.util.concurrent.Executors
 
 class FileSystemResourceLoader(baseDir: File)
   extends ResourceLoader with Logging {
