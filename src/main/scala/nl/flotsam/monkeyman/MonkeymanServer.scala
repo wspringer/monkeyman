@@ -65,15 +65,22 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
       info("Handling {} for {}", exchange.getRequestMethod, path)
       if (exchange.getRequestMethod == "GET") {
         val lookup = path.substring(1)
-//          if (path == "/") "index.html"
-//          else path.substring(1)
         config.registry.resourceByPath.get(lookup) match {
+          case Some(resource) if resource.contentType == "application/directory" =>
+            config.registry.resourceByPath.get(resource.path + "/index.html") match {
+              case Some(altResource) =>
+                info("Sending index.html")
+                sendResource(altResource, exchange)
+              case None =>
+                sendStatus(404, "Not found", exchange)
+            }
           case Some(resource) =>
             sendResource(resource, exchange)
           case None =>
             sendStatus(404, "Not found", exchange)
         }
       } else {
+        println(config.registry.allResources.map(_.path).mkString("\n"))
         sendStatus(405, "Method not allowed", exchange)
       }
     }

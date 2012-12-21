@@ -121,7 +121,9 @@ class FileSystemResourceLoader(baseDir: File)
         new OrFileFilter(
           List(
             new PrefixFileFilter(".#"),
-            new SuffixFileFilter("~")
+            new SuffixFileFilter("~"),
+            new PrefixFileFilter("."),
+            new RegexFileFilter("^#[^#]*#$")
           )
         )
       ), TrueFileFilter.INSTANCE).map(load).toSeq

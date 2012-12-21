@@ -33,8 +33,8 @@ class DirectoryBrowsingDecoration(resource: Resource, allResources: () => Seq[Re
   override def open = {
     val content = (for {
       res <- allResources()
-      if (res.contentType != "application/directory" && FilenameUtils.getPath(res.path) == resource.path + "/")
-    } yield " * " + FilenameUtils.getName(res.path))
+      if (res.path != this.path && FilenameUtils.getPathNoEndSeparator(res.path) == resource.path)
+    } yield " * " + FilenameUtils.getName(res.path) + " (" + res.contentType + ")")
     new ByteArrayInputStream(content.mkString("\n").getBytes("UTF-8"))
   }
 
