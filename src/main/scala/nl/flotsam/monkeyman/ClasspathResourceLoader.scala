@@ -34,8 +34,10 @@ class ClasspathResourceLoader(paths: Seq[String], loader: ResourceLoader) extend
     loader.register(new ResourceListener {
       def deleted(id: String) {
         resources.find(_.id == id) match {
-          case Some(resource) => listener.modified(resource)
-          case None => listener.deleted(id)
+          case Some(resource) =>
+            listener.modified(resource)
+          case None =>
+            listener.deleted(id)
         }
       }
 

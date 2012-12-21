@@ -80,5 +80,7 @@ trait Resource {
    * The unique identifier of this resource. Doesn't change during its lifetime.
    */
   def id: String
+
+  def supportsPathRewrite = false
   
 }

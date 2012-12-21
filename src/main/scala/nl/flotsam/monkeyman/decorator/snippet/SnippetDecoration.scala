@@ -32,7 +32,10 @@ class SnippetDecoration(resource: Resource, layoutResolver: LayoutResolver, engi
 
   override def contentType = "text/html"
 
-  override lazy val path = FilenameUtils.removeExtension(resource.path) + ".html"
+  override def path = {
+    if (!FilenameUtils.getExtension(resource.path).isEmpty) FilenameUtils.removeExtension(resource.path) + ".html"
+    else resource.path
+  }
 
   override def open =
     using(resource.open) {

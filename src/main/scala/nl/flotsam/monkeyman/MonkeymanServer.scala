@@ -64,35 +64,39 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
       val path = exchange.getRequestURI.getPath
       info("Handling {} for {}", exchange.getRequestMethod, path)
       if (exchange.getRequestMethod == "GET") {
-        val lookup =
-          if (path == "/") "index.html"
-          else path.substring(1)
+        val lookup = path.substring(1)
+//          if (path == "/") "index.html"
+//          else path.substring(1)
         config.registry.resourceByPath.get(lookup) match {
           case Some(resource) =>
-            try {
-              using(new ByteArrayOutputStream) {
-                out =>
-                  using(resource.open) {
-                    in =>
-                      IOUtils.copy(in, out)
-                  }
-                  val buffer = out.toByteArray
-                  val responseHeaders = exchange.getResponseHeaders
-                  responseHeaders.set("Content-Type", resource.contentType)
-                  exchange.sendResponseHeaders(200, buffer.length)
-                  using(exchange.getResponseBody)(_.write(buffer))
-              }
-            } catch {
-              case t: Throwable =>
-                error("Failed to handle request", t)
-                sendStatus(500, "Failed to handle request", exchange)
-            }
+            sendResource(resource, exchange)
           case None =>
             sendStatus(404, "Not found", exchange)
         }
       } else {
         sendStatus(405, "Method not allowed", exchange)
       }
+    }
+  }
+
+  private def sendResource(resource: Resource, exchange: HttpExchange) {
+    try {
+      using(new ByteArrayOutputStream) {
+        out =>
+          using(resource.open) {
+            in =>
+              IOUtils.copy(in, out)
+          }
+          val buffer = out.toByteArray
+          val responseHeaders = exchange.getResponseHeaders
+          responseHeaders.set("Content-Type", resource.contentType)
+          exchange.sendResponseHeaders(200, buffer.length)
+          using(exchange.getResponseBody)(_.write(buffer))
+      }
+    } catch {
+      case t: Throwable =>
+        error("Failed to handle request", t)
+        sendStatus(500, "Failed to handle request", exchange)
     }
   }
 

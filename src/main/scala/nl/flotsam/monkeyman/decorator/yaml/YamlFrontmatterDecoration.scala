@@ -48,14 +48,17 @@ class YamlFrontmatterDecoration(resource: Resource) extends ResourceDecoration(r
     patterns.flatMap(tryParse).headOption
   }
 
-  lazy val (attributes, content) = {
+  def attributes = extract._1
+
+  def content = extract._2
+
+  def extract =
     allCatch.opt(using(resource.open)(IOUtils.toString(_, "UTF-8"))) match {
       case Some(str) =>
         extractAttributes(str)
       case None => 
         (Map.empty[String, String], None)
     }
-  }
 
   override def title = {
     val title = attributes.get("title").map(_.asInstanceOf[String])

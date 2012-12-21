@@ -26,20 +26,23 @@ case class Registry(loader: ResourceLoader)
   with Logging
 {
 
-  val allResources = loader.load.toList
-  private val resourceById = collection.mutable.Map(allResources.map(resource => resource.id -> resource): _*)
-  val resourceByPath = collection.mutable.Map(allResources.map(resource => resource.path -> resource): _*)
+  private val resources = loader.load.toBuffer
+  def allResources = resources.toList
+  private val resourceById = collection.mutable.Map(resources.map(resource => resource.id -> resource): _*)
+  val resourceByPath = collection.mutable.Map(resources.map(resource => resource.path -> resource): _*)
 
   loader.register(this)
 
   def deleted(id: String) {
-    resourceById.get(id) match {
+    val resource = resourceById.get(id)
+    resource match {
       case Some(resource) =>
-        info("Removed {} ({})", resource.id, resource.path)
+        info("Removed {}", resource.id)
         resourceById -= id
         resourceByPath -= resource.path
+        resources -= resource
       case None =>
-      // TODO: Add warning here
+        info("Failed to find {}", id)
     }
   }
 
@@ -47,16 +50,19 @@ case class Registry(loader: ResourceLoader)
     info("Added {} ({})", resource.id, resource.path)
     resourceById += resource.id -> resource
     resourceByPath += resource.path -> resource
+    resources += resource
   }
 
   def modified(resource: Resource) {
     info("Modified {} ({})", resource.id, resource.path)
+    resources.find(_.id == resource.id).map(resources -=)
     resourceById.get(resource.id).map(previous => if (previous.path != resource.path) {
       info("Changing path of {} to {}", previous.id, resource.path)
       resourceByPath -= previous.path
     })
     resourceById += resource.id -> resource
     resourceByPath += resource.path -> resource
+    resources += resource
   }
 
 }

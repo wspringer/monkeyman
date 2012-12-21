@@ -17,40 +17,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman
+package nl.flotsam.monkeyman.decorator.directory
 
-import java.io.{FileInputStream, File}
-import eu.medsea.mimeutil.{MimeType, MimeUtil}
-import collection.JavaConversions
-import JavaConversions._
-import org.joda.time.LocalDateTime
+import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
 
-case class FileSystemResource(baseDir: File, path: String) extends Resource {
+class DirectoryBrowsingDecorator(allResources: () => Seq[Resource]) extends ResourceDecorator {
 
-  lazy val url = file.toURI.toURL
-
-  lazy val file = new File(baseDir, path)
-
-  lazy val title = None
-
-  val subtitle = None
-
-  val summary = None
-
-  lazy val pubDateTime = new LocalDateTime(file.lastModified())
-
-  lazy val contentType = MimeUtil.getMimeTypes(file).asInstanceOf[java.util.Set[MimeType]].head.toString
-
-  def open = new FileInputStream(file)
-
-  def tags = Set.empty
-
-  def published = true
-
-  def asHtmlFragment = None
-
-  def id = path
-
-  override def supportsPathRewrite = !file.isDirectory
+  def decorate(resource: Resource) =
+    if (resource.contentType == "application/directory") new DirectoryBrowsingDecoration(resource, allResources)
+    else resource
 
 }

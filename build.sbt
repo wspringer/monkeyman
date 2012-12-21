@@ -11,7 +11,7 @@ libraryDependencies ++= Seq(
   "org.fusesource.scalamd" % "scalamd" % "1.5",
   "joda-time" % "joda-time" % "2.0",
   "eu.medsea.mimeutil" % "mime-util" % "2.1.3" intransitive,
-  "commons-io" % "commons-io" % "2.1",
+  "commons-io" % "commons-io" % "2.4",
   "org.joda" % "joda-convert" % "1.2",
   "org.fusesource.scalate" % "scalate-core" % "1.5.2-scala_2.8.1",
   "org.clapper" %% "argot" % "0.3.3",
@@ -48,3 +48,5 @@ jarName in assembly := "monkeyman.jar"
 fork in run := true
 
 connectInput in run := true
+
+compileOrder := CompileOrder.JavaThenScala

@@ -19,6 +19,7 @@
 
 package nl.flotsam.monkeyman
 
+import decorator.directory.DirectoryBrowsingDecorator
 import decorator.less.LessDecorator
 import decorator.markdown.MarkdownDecorator
 import decorator.permalink.PermalinkDecorator
@@ -103,6 +104,7 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File, sections: Bo
     new Registry(
       new DecoratingResourceLoader(
         new ClasspathResourceLoader(Seq("favicon.ico", "monkeyman/logo.png", "monkeyman/monkeyman.less"), fileSystemResourceLoader),
+        new DirectoryBrowsingDecorator(allResources _),
         new LessDecorator,
         new ZussDecorator,
         new YamlFrontmatterDecorator(),
