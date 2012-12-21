@@ -43,7 +43,7 @@ class RegistryDecorator extends ResourceDecorator with ResourceListener with Log
         resourcesById -= id
         resourceByPath -= resource.path
       case None =>
-        // TODO: Add warning here
+        warn("Entering illegal state: can't find resource with id " + id)
     }
   }
 

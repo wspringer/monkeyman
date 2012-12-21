@@ -36,6 +36,10 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
   private val port = parser.option[Int](List("p", "port"), "PORT",
     "The port on which the server will be listening. Defaults to " + DEFAULT_PORT + ".")
 
+  private val browsing =  parser.flag(List("d", "directory-browsing"), "Directory browsing.")
+
+  override def directoryBrowsing = browsing.value == Some(true)
+
   def execute(config: MonkeymanConfiguration) {
     val selectedPort = port.value.getOrElse(DEFAULT_PORT)
     val address = new InetSocketAddress(selectedPort)
@@ -64,35 +68,49 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
       val path = exchange.getRequestURI.getPath
       info("Handling {} for {}", exchange.getRequestMethod, path)
       if (exchange.getRequestMethod == "GET") {
-        val lookup =
-          if (path == "/") "index.html"
-          else path.substring(1)
+        val lookup = path.substring(1)
         config.registry.resourceByPath.get(lookup) match {
-          case Some(resource) =>
-            try {
-              using(new ByteArrayOutputStream) {
-                out =>
-                  using(resource.open) {
-                    in =>
-                      IOUtils.copy(in, out)
-                  }
-                  val buffer = out.toByteArray
-                  val responseHeaders = exchange.getResponseHeaders
-                  responseHeaders.set("Content-Type", resource.contentType)
-                  exchange.sendResponseHeaders(200, buffer.length)
-                  using(exchange.getResponseBody)(_.write(buffer))
-              }
-            } catch {
-              case t: Throwable =>
-                error("Failed to handle request", t)
-                sendStatus(500, "Failed to handle request", exchange)
+          case Some(resource) if resource.contentType == "application/directory" =>
+            val altPath =
+              if (resource.path == "") "index.html"
+              else resource.path + "/index.html"
+            config.registry.resourceByPath.get(altPath) match {
+              case Some(altResource) =>
+                info("Sending index.html")
+                sendResource(altResource, exchange)
+              case None =>
+                sendStatus(404, "Not found", exchange)
             }
+          case Some(resource) =>
+            sendResource(resource, exchange)
           case None =>
             sendStatus(404, "Not found", exchange)
         }
       } else {
+        println(config.registry.allResources.map(_.path).mkString("\n"))
         sendStatus(405, "Method not allowed", exchange)
       }
+    }
+  }
+
+  private def sendResource(resource: Resource, exchange: HttpExchange) {
+    try {
+      using(new ByteArrayOutputStream) {
+        out =>
+          using(resource.open) {
+            in =>
+              IOUtils.copy(in, out)
+          }
+          val buffer = out.toByteArray
+          val responseHeaders = exchange.getResponseHeaders
+          responseHeaders.set("Content-Type", resource.contentType)
+          exchange.sendResponseHeaders(200, buffer.length)
+          using(exchange.getResponseBody)(_.write(buffer))
+      }
+    } catch {
+      case t: Throwable =>
+        error("Failed to handle request", t)
+        sendStatus(500, "Failed to handle request", exchange)
     }
   }
 

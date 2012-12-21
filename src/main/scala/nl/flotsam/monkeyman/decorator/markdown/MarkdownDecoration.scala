@@ -30,26 +30,31 @@ import nl.flotsam.monkeyman.util.Logging
 case class MarkdownDecoration(resource: Resource, sections: Boolean)
   extends ResourceDecoration(resource) with Logging {
 
-  lazy val (extractedTitle, html) = {
-    using(resource.open) {
-      in =>
-        val markdown = IOUtils.toString(in, "UTF-8")
-        val processor = new PegDownProcessor
-        val rootNode = processor.parseMarkdown(markdown.toCharArray)
-        val visitor = new TitleExtractingToHtmlSerializer(new LinkRenderer)
-        val html =
-          if (sections) "<section>" + visitor.toHtml(rootNode) + "</section>"
-          else visitor.toHtml(rootNode)
-        val title = visitor.title
-        (title, html)
-    }
+  def extractedTitle = extract._1
+
+  def html = extract._2
+
+  def extract = using(resource.open) {
+    in =>
+      val markdown = IOUtils.toString(in, "UTF-8")
+      val processor = new PegDownProcessor
+      val rootNode = processor.parseMarkdown(markdown.toCharArray)
+      val visitor = new TitleExtractingToHtmlSerializer(new LinkRenderer)
+      val html =
+        if (sections) "<section>" + visitor.toHtml(rootNode) + "</section>"
+        else visitor.toHtml(rootNode)
+      val title = visitor.title
+      (title, html)
   }
 
   override def title = resource.title.orElse(extractedTitle)
 
   override val contentType = "text/x-html-fragment"
 
-  override lazy val path = FilenameUtils.removeExtension(resource.path) + ".frag"
+  override def path = {
+    if (!FilenameUtils.getExtension(resource.path).isEmpty) FilenameUtils.removeExtension(resource.path) + ".frag"
+    else resource.path
+  }
 
   override def open = IOUtils.toInputStream(html, "UTF-8")
 

@@ -27,13 +27,15 @@ import annotation.tailrec
 
 case class PermalinkDecoration(resource: Resource) extends ResourceDecoration(resource) {
 
-  override def path =
-    resource.title.map {
-      str =>
-        getPath(resource.path) +
-        permalinkName(getBaseName(str), 60) +
-        "." + getExtension(resource.path)
-    }.getOrElse(resource.path)
+  override lazy val path =
+    if (resource.supportsPathRewrite)
+      resource.title.map {
+        str =>
+          getPath(resource.path) +
+            permalinkName(getBaseName(str), 60) +
+            "." + getExtension(resource.path)
+      }.getOrElse(resource.path)
+    else resource.path
 
   /**
    * Turns the String into something that wouldn't suck being part of a URI.
@@ -84,8 +86,6 @@ case class PermalinkDecoration(resource: Resource) extends ResourceDecoration(re
     }
 
   }
-
-
 
 
 }

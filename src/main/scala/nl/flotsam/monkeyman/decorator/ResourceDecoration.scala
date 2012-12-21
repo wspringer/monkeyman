@@ -45,4 +45,5 @@ class ResourceDecoration(resource: Resource) extends Resource {
 
   def id = resource.id
 
+  override def supportsPathRewrite = resource.supportsPathRewrite
 }

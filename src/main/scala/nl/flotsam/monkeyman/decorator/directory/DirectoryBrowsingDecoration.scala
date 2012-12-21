@@ -17,40 +17,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman
+package nl.flotsam.monkeyman.decorator.directory
 
-import java.io.{FileInputStream, File}
-import eu.medsea.mimeutil.{MimeType, MimeUtil}
-import collection.JavaConversions
-import JavaConversions._
-import org.joda.time.LocalDateTime
+import nl.flotsam.monkeyman.decorator.ResourceDecoration
+import nl.flotsam.monkeyman.Resource
+import org.apache.commons.io.FilenameUtils
+import java.io.ByteArrayInputStream
 
-case class FileSystemResource(baseDir: File, path: String) extends Resource {
+class DirectoryBrowsingDecoration(resource: Resource, allResources: () => Seq[Resource]) extends ResourceDecoration(resource) {
 
-  lazy val url = file.toURI.toURL
+  override def contentType = "text/plain"
 
-  lazy val file = new File(baseDir, path)
+  override def title = Some("Index")
 
-  lazy val title = None
+  override def open = {
+    val content = (for {
+      res <- allResources()
+      if (res.path != this.path && FilenameUtils.getPathNoEndSeparator(res.path) == resource.path)
+    } yield " * " + FilenameUtils.getName(res.path) + " (" + res.contentType + ")")
+    new ByteArrayInputStream(content.mkString("\n").getBytes("UTF-8"))
+  }
 
-  val subtitle = None
-
-  val summary = None
-
-  lazy val pubDateTime = new LocalDateTime(file.lastModified())
-
-  lazy val contentType = MimeUtil.getMimeTypes(file).asInstanceOf[java.util.Set[MimeType]].head.toString
-
-  def open = new FileInputStream(file)
-
-  def tags = Set.empty
-
-  def published = true
-
-  def asHtmlFragment = None
-
-  def id = path
-
-  override def supportsPathRewrite = !file.isDirectory
+  override def supportsPathRewrite = false
 
 }
