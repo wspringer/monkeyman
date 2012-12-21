@@ -19,7 +19,7 @@
 
 package nl.flotsam.monkeyman
 
-class DecoratingResourceLoader(loader: ResourceLoader, decorators: ResourceDecorator*) extends ResourceLoader {
+class DecoratingResourceLoader(loader: ResourceLoader, decorators: List[ResourceDecorator]) extends ResourceLoader {
 
   def load = loader.load.map(decorate)
   

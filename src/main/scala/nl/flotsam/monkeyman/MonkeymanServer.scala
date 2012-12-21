@@ -36,6 +36,10 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
   private val port = parser.option[Int](List("p", "port"), "PORT",
     "The port on which the server will be listening. Defaults to " + DEFAULT_PORT + ".")
 
+  private val browsing =  parser.flag(List("d", "directory-browsing"), "Directory browsing.")
+
+  override def directoryBrowsing = browsing.value == Some(true)
+
   def execute(config: MonkeymanConfiguration) {
     val selectedPort = port.value.getOrElse(DEFAULT_PORT)
     val address = new InetSocketAddress(selectedPort)
@@ -67,7 +71,10 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
         val lookup = path.substring(1)
         config.registry.resourceByPath.get(lookup) match {
           case Some(resource) if resource.contentType == "application/directory" =>
-            config.registry.resourceByPath.get(resource.path + "/index.html") match {
+            val altPath =
+              if (resource.path == "") "index.html"
+              else resource.path + "/index.html"
+            config.registry.resourceByPath.get(altPath) match {
               case Some(altResource) =>
                 info("Sending index.html")
                 sendResource(altResource, exchange)

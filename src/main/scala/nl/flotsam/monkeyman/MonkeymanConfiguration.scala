@@ -33,7 +33,11 @@ import org.fusesource.scalate.{Binding, Template, TemplateEngine}
 import org.fusesource.scalate.util.{ResourceLoader => ScalateResourceLoader}
 import org.fusesource.scalate.support.URLTemplateSource
 
-case class MonkeymanConfiguration(sourceDir: File, layoutDir: File, sections: Boolean = false) {
+case class MonkeymanConfiguration(sourceDir: File,
+                                  layoutDir: File,
+                                  sections: Boolean = false,
+                                  directoryBrowsing: Boolean = false)
+{
 
   private val layoutFileName = "layout"
 
@@ -104,14 +108,16 @@ case class MonkeymanConfiguration(sourceDir: File, layoutDir: File, sections: Bo
     new Registry(
       new DecoratingResourceLoader(
         new ClasspathResourceLoader(Seq("favicon.ico", "monkeyman/logo.png", "monkeyman/monkeyman.less"), fileSystemResourceLoader),
-        new DirectoryBrowsingDecorator(allResources _),
-        new LessDecorator,
-        new ZussDecorator,
-        new YamlFrontmatterDecorator(),
-        new MarkdownDecorator(sections),
-        new SnippetDecorator(layoutResolver, templateEngine, allResources _),
-        new ScalateDecorator(templateEngine, allResources _),
-        PermalinkDecorator
+        List(
+          if (directoryBrowsing) Some(new DirectoryBrowsingDecorator(allResources _)) else None,
+          Some(new LessDecorator),
+          Some(new ZussDecorator),
+          Some(new YamlFrontmatterDecorator()),
+          Some(new MarkdownDecorator(sections)),
+          Some(new SnippetDecorator(layoutResolver, templateEngine, allResources _)),
+          Some(new ScalateDecorator(templateEngine, allResources _)),
+          Some(PermalinkDecorator)
+        ).flatten
       )
     )
 

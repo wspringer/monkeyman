@@ -54,7 +54,6 @@ class FileSystemResourceLoader(baseDir: File)
     dir <- expand(baseDir)
     path = Paths.get(dir.getAbsolutePath)
   } {
-    info("Registering " + path)
     keys += path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY) -> path
   }
 

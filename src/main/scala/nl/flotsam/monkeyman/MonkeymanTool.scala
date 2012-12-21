@@ -55,6 +55,8 @@ abstract class MonkeymanTool(toolName: String) {
       else new File(name)
   }
 
+  def directoryBrowsing: Boolean = false
+
   val sections = parser.flag[Boolean]("sections", false, "Interpret markdown horizontal rules as section breaks.")
 
   def main(args: Array[String]) {
@@ -66,7 +68,8 @@ abstract class MonkeymanTool(toolName: String) {
         val config = new MonkeymanConfiguration(
           sourceDir = sourceDir.value.getOrElse(new File(workingDir, "source")),
           layoutDir = layoutDir.value.getOrElse(new File(workingDir, "layout")),
-          sections = sections.value.getOrElse(false)
+          sections = sections.value.getOrElse(false),
+          directoryBrowsing = directoryBrowsing
         )
         try {
           if (!config.sourceDir.exists()) {
