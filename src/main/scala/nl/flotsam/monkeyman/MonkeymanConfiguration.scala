@@ -28,6 +28,7 @@ import decorator.snippet.SnippetDecorator
 import decorator.yaml.YamlFrontmatterDecorator
 import decorator.zuss.ZussDecorator
 import java.io.File
+import loader.resize.ResizingResourceLoader
 import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Binding, Template, TemplateEngine}
 import org.fusesource.scalate.util.{ResourceLoader => ScalateResourceLoader}
@@ -36,8 +37,7 @@ import org.fusesource.scalate.support.URLTemplateSource
 case class MonkeymanConfiguration(sourceDir: File,
                                   layoutDir: File,
                                   sections: Boolean = false,
-                                  directoryBrowsing: Boolean = false)
-{
+                                  directoryBrowsing: Boolean = false) {
 
   private val layoutFileName = "layout"
 
@@ -88,7 +88,7 @@ case class MonkeymanConfiguration(sourceDir: File,
   ) :: new Binding(
     name = "body",
     className = "String",
-    defaultValue = Some(""""No body"""")
+    defaultValue = Some( """"No body"""")
   ) :: new Binding(
     name = "tags",
     className = "Set[String]",
@@ -101,28 +101,31 @@ case class MonkeymanConfiguration(sourceDir: File,
     name = "id",
     className = "String",
     defaultValue = None
-  ):: templateEngine.bindings
+  ) :: templateEngine.bindings
 
 
   val registry =
     new Registry(
-      new DecoratingResourceLoader(
-        new ClasspathResourceLoader(Seq("favicon.ico", "monkeyman/logo.png", "monkeyman/monkeyman.less"), fileSystemResourceLoader),
-        List(
-          if (directoryBrowsing) Some(new DirectoryBrowsingDecorator(allResources _)) else None,
-          Some(new LessDecorator),
-          Some(new ZussDecorator),
-          Some(new YamlFrontmatterDecorator()),
-          Some(new MarkdownDecorator(sections)),
-          Some(new SnippetDecorator(layoutResolver, templateEngine, allResources _)),
-          Some(new ScalateDecorator(templateEngine, allResources _)),
-          Some(PermalinkDecorator)
-        ).flatten
+      new ResizingResourceLoader(
+        new DecoratingResourceLoader(
+          new ClasspathResourceLoader(Seq("favicon.ico", "monkeyman/logo.png", "monkeyman/monkeyman.less"),
+            fileSystemResourceLoader),
+          List(
+            if (directoryBrowsing) Some(new DirectoryBrowsingDecorator(allResources _)) else None,
+            Some(new LessDecorator),
+            Some(new ZussDecorator),
+            Some(new YamlFrontmatterDecorator()),
+            Some(new MarkdownDecorator(sections)),
+            Some(new SnippetDecorator(layoutResolver, templateEngine, allResources _)),
+            Some(new ScalateDecorator(templateEngine, allResources _)),
+            Some(PermalinkDecorator)
+          ).flatten
+        )
       )
     )
 
   def allResources: List[Resource] = registry.allResources
-  
+
   private def tryLoadTemplate(dir: File): Template = {
     val files =
       TemplateEngine.templateTypes.view.map(ext => new File(dir, layoutFileName + "." + ext))

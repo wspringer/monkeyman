@@ -26,10 +26,10 @@ case class Registry(loader: ResourceLoader)
   with Logging
 {
 
-  private val resources = loader.load.toBuffer
+  private lazy val resources = loader.load.toBuffer
   def allResources = resources.toList
-  private val resourceById = collection.mutable.Map(resources.map(resource => resource.id -> resource): _*)
-  val resourceByPath = collection.mutable.Map(resources.map(resource => resource.path -> resource): _*)
+  private lazy val resourceById = collection.mutable.Map(resources.map(resource => resource.id -> resource): _*)
+  lazy val resourceByPath = collection.mutable.Map(resources.map(resource => resource.path -> resource): _*)
 
   loader.register(this)
 
