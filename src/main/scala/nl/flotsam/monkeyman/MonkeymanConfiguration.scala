@@ -24,15 +24,20 @@ import decorator.less.LessDecorator
 import decorator.markdown.MarkdownDecorator
 import decorator.permalink.PermalinkDecorator
 import decorator.scalate.ScalateDecorator
-import decorator.snippet.SnippetDecorator
+import decorator.snippet.{SnippetDecoration, SnippetDecorator}
 import decorator.yaml.YamlFrontmatterDecorator
 import decorator.zuss.ZussDecorator
-import java.io.File
-import loader.resize.ResizingResourceLoader
+import java.io.{ByteArrayInputStream, File}
+import loader.resize.ResizedResource
 import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Binding, Template, TemplateEngine}
 import org.fusesource.scalate.util.{ResourceLoader => ScalateResourceLoader}
 import org.fusesource.scalate.support.URLTemplateSource
+import org.apache.commons.io.{FilenameUtils, IOUtils}
+import org.jsoup.Jsoup
+import scala.collection.JavaConversions._
+import collection.mutable
+import scala.util.control.Exception.allCatch
 
 case class MonkeymanConfiguration(sourceDir: File,
                                   layoutDir: File,
@@ -106,25 +111,75 @@ case class MonkeymanConfiguration(sourceDir: File,
 
   val registry =
     new Registry(
-      new ResizingResourceLoader(
-        new DecoratingResourceLoader(
-          new ClasspathResourceLoader(Seq("favicon.ico", "monkeyman/logo.png", "monkeyman/monkeyman.less"),
-            fileSystemResourceLoader),
-          List(
-            if (directoryBrowsing) Some(new DirectoryBrowsingDecorator(allResources _)) else None,
-            Some(new LessDecorator),
-            Some(new ZussDecorator),
-            Some(new YamlFrontmatterDecorator()),
-            Some(new MarkdownDecorator(sections)),
-            Some(new SnippetDecorator(layoutResolver, templateEngine, allResources _)),
-            Some(new ScalateDecorator(templateEngine, allResources _)),
-            Some(PermalinkDecorator)
-          ).flatten
-        )
+      new DecoratingResourceLoader(
+        new ClasspathResourceLoader(Seq("favicon.ico", "monkeyman/logo.png", "monkeyman/monkeyman.less"),
+          fileSystemResourceLoader),
+        List(
+          if (directoryBrowsing) Some(new DirectoryBrowsingDecorator(allResources _)) else None,
+          Some(new LessDecorator),
+          Some(new ZussDecorator),
+          Some(new YamlFrontmatterDecorator()),
+          Some(new MarkdownDecorator(sections)),
+          Some(new SnippetDecorator(layoutResolver, templateEngine, allResources _)),
+          Some(new ScalateDecorator(templateEngine, allResources _)),
+          Some(PermalinkDecorator)
+        ).flatten
       )
     )
 
   def allResources: List[Resource] = registry.allResources
+
+  def resized(resource: Resource) = {
+    val ResizedImage = """^(.*)-([0-9]+)x([0-9]+)\.([a-z]+)$""".r
+    if (resource.contentType == "text/html") {
+      val html = IOUtils.toString(resource.open, "UTF-8")
+      val parsed = Jsoup.parse(html)
+      (for {
+        img <- parsed.select("img").toList
+        src = img.attr("src")
+        List(base, width, height, ext) <- ResizedImage.unapplySeq(src)
+      } yield new ResizedResource(
+          src,
+          allCatch.opt(width.toInt),
+          allCatch.opt(height.toInt),
+          base + "." + ext,
+          allResources _
+        )).toList
+    } else List.empty
+  }
+
+  def imagefragment(resource: Resource) = {
+    if (resource.contentType == "text/html") {
+      val html = IOUtils.toString(resource.open, "UTF-8")
+      val parsed = Jsoup.parse(html)
+      (for {
+        anchor <- parsed.select("a").toList
+        href = anchor.attr("href")
+        path = FilenameUtils.concat(resource.folderName, href)
+        if path.endsWith(".html") && !allResources.exists(_.path == path)
+        directory = FilenameUtils.getPath(path)
+        basename = FilenameUtils.getBaseName(path)
+        addressed = FilenameUtils.concat(directory, basename)
+        img <- allResources.find(_.path == addressed)
+        if img.contentType.startsWith("image")
+      } yield new SnippetDecoration(new Resource {
+        def title = img.title
+        def subtitle = img.subtitle
+        def summary = img.summary
+        def pubDateTime = img.pubDateTime
+        def contentType = "text/x-html-fragment"
+        def open = new ByteArrayInputStream(asHtmlFragment.get.getBytes("UTF-8"))
+        def path = addressed + ".frag"
+        def tags = img.tags
+        def published = true
+        def asHtmlFragment = Some("""<img src="%s"/>""".format(img.path))
+        def id = path
+      }, layoutResolver, templateEngine, allResources _)).toList
+    } else List.empty
+  }
+
+  registry.register(new ResourceGenerator(registry, resized _))
+  registry.register(new ResourceGenerator(registry, imagefragment _))
 
   private def tryLoadTemplate(dir: File): Template = {
     val files =

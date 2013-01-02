@@ -91,9 +91,15 @@ trait Resource {
 
   lazy val fileName = FilenameUtils.getName(path)
 
+  def baseName = FilenameUtils.getBaseName(path)
+
+  def extension = FilenameUtils.getExtension(path)
+
   /**
    * Gets the siblings from a collection of resources.
    */
   def siblings(resources: Seq[Resource]) = resources.filter(_.folderName == folderName)
+
+  def generated = false
   
 }

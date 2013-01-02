@@ -20,8 +20,22 @@
 package nl.flotsam.monkeyman.loader.resize
 
 import nl.flotsam.monkeyman.Resource
+import nl.flotsam.monkeyman.util.Closeables
+import javax.imageio.ImageIO
+import org.imgscalr.Scalr
+import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.output.ByteArrayOutputStream
+import java.io.ByteArrayInputStream
 
-class ResizedResource(val path: String, width: String, height: String, resource: Resource) extends Resource {
+class ResizedResource(val path: String,
+                      width: Option[Int],
+                      height: Option[Int],
+                      original: String,
+                      allResources: () => List[Resource])
+  extends Resource {
+
+  private def resource = allResources().find(_.id == original).get
+
   def title = resource.title
 
   def subtitle = resource.subtitle
@@ -32,7 +46,17 @@ class ResizedResource(val path: String, width: String, height: String, resource:
 
   def contentType = resource.contentType
 
-  def open = resource.open
+  def open =
+    if (width.isDefined && height.isDefined) {
+      Closeables.using(resource.open) {
+        in =>
+          val src = ImageIO.read(in)
+          val resized = Scalr.resize(src, width.get, height.get, Scalr.OP_ANTIALIAS)
+          val buffer = new ByteArrayOutputStream()
+          ImageIO.write(resized, FilenameUtils.getExtension(path), buffer)
+          new ByteArrayInputStream(buffer.toByteArray)
+      }
+    } else resource.open
 
   def tags = resource.tags
 
@@ -41,4 +65,7 @@ class ResizedResource(val path: String, width: String, height: String, resource:
   def asHtmlFragment = None
 
   def id = path
+
+  override def generated = true
+
 }
