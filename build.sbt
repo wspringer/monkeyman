@@ -19,7 +19,9 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-core" % "1.0.0",
   "ch.qos.logback" % "logback-classic" % "1.0.0",
   "com.asual.lesscss" % "lesscss-engine" % "1.1.5",
-  "org.yaml" % "snakeyaml" % "1.10"
+  "org.yaml" % "snakeyaml" % "1.10",
+  "org.jsoup" % "jsoup" % "1.6.3"
+//  "org.imgscalr" % "imgscalr-lib" % "4.2"
 )
 
 resolvers ++= Seq(

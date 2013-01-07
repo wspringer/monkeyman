@@ -21,6 +21,7 @@ package nl.flotsam.monkeyman
 
 import java.io.InputStream
 import org.joda.time.LocalDateTime
+import org.apache.commons.io.FilenameUtils
 
 trait Resource {
 
@@ -82,5 +83,23 @@ trait Resource {
   def id: String
 
   def supportsPathRewrite = false
+
+  /**
+   * The folder in which a resource resides. (The path without the filename.)
+   */
+  lazy val folderName = FilenameUtils.getPath(path)
+
+  lazy val fileName = FilenameUtils.getName(path)
+
+  def baseName = FilenameUtils.getBaseName(path)
+
+  def extension = FilenameUtils.getExtension(path)
+
+  /**
+   * Gets the siblings from a collection of resources.
+   */
+  def siblings(resources: Seq[Resource]) = resources.filter(_.folderName == folderName)
+
+  def generated = false
   
 }
