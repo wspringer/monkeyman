@@ -26,10 +26,12 @@ import org.imgscalr.Scalr
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.output.ByteArrayOutputStream
 import java.io.ByteArrayInputStream
+import org.imgscalr.Scalr.Mode
 
 class ResizedResource(val path: String,
                       width: Option[Int],
                       height: Option[Int],
+                      crop: Boolean = false,
                       original: String,
                       allResources: () => List[Resource])
   extends Resource {
@@ -46,17 +48,36 @@ class ResizedResource(val path: String,
 
   def contentType = resource.contentType
 
-  def open =
-    if (width.isDefined && height.isDefined) {
-      Closeables.using(resource.open) {
-        in =>
-          val src = ImageIO.read(in)
-          val resized = Scalr.resize(src, width.get, height.get, Scalr.OP_ANTIALIAS)
-          val buffer = new ByteArrayOutputStream()
-          ImageIO.write(resized, FilenameUtils.getExtension(path), buffer)
-          new ByteArrayInputStream(buffer.toByteArray)
+  /**
+   * Fix the image in a box.
+   *
+   * If only height is defined, then resize height
+   * If only width is defined, then resize width
+   * If width and height is defined, then fit in the given box, which means comparing aspect ratio of both the
+   * bounding box and the incoming image. If crop is set, then do the opposite.
+   */
+  def open = Closeables.using(resource.open) {
+    in =>
+      val src = ImageIO.read(in)
+      val resized = (width, height) match {
+        case (Some(w), None) => Scalr.resize(src, Mode.FIT_TO_WIDTH, w, Scalr.OP_ANTIALIAS)
+        case (None, Some(h)) => Scalr.resize(src, Mode.FIT_TO_HEIGHT, h, Scalr.OP_ANTIALIAS)
+        case (Some(w), Some(h)) =>
+          if (crop) {
+            if (w.toDouble / h.toDouble > src.getWidth.toDouble / src.getHeight.toDouble) {
+              val img = Scalr.resize(src, Mode.FIT_TO_WIDTH, w, Scalr.OP_ANTIALIAS)
+              img.getSubimage(0, (img.getHeight - h) / 2, w, h)
+            } else {
+              val img = Scalr.resize(src, Mode.FIT_TO_HEIGHT, h, Scalr.OP_ANTIALIAS)
+              img.getSubimage((img.getWidth - w) / 2, 0, w, h)
+            }
+          } else Scalr.resize(src, w, h, Scalr.OP_ANTIALIAS)
+        case _ => throw new IllegalStateException("Got different parameters than expected")
       }
-    } else resource.open
+      val buffer = new ByteArrayOutputStream()
+      ImageIO.write(resized, FilenameUtils.getExtension(path), buffer)
+      new ByteArrayInputStream(buffer.toByteArray)
+  }
 
   def tags = resource.tags
 

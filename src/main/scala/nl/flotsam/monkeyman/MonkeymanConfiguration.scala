@@ -38,6 +38,7 @@ import org.jsoup.Jsoup
 import scala.collection.JavaConversions._
 import collection.mutable
 import scala.util.control.Exception.allCatch
+import java.net.URL
 
 case class MonkeymanConfiguration(sourceDir: File,
                                   layoutDir: File,
@@ -130,21 +131,36 @@ case class MonkeymanConfiguration(sourceDir: File,
   def allResources: List[Resource] = registry.allResources
 
   def resized(resource: Resource) = {
-    val ResizedImage = """^(.*)-([0-9]+)x([0-9]+)\.([a-z]+)$""".r
+    val ResizedImage = """^(.*)-([0-9]+|_)x([0-9]+|_)([c]?)\.([a-z]+)$""".r
     if (resource.contentType == "text/html") {
       val html = IOUtils.toString(resource.open, "UTF-8")
       val parsed = Jsoup.parse(html)
       (for {
         img <- parsed.select("img").toList
         src = img.attr("src")
-        List(base, width, height, ext) <- ResizedImage.unapplySeq(src)
+        cleaned = if (src.startsWith("./")) src.substring(2) else src
+        if !allResources.exists(_.path == cleaned)
+        List(base, width, height, indicator, ext) <- ResizedImage.unapplySeq(cleaned)
       } yield new ResizedResource(
           src,
           allCatch.opt(width.toInt),
           allCatch.opt(height.toInt),
+          indicator == "c",
           base + "." + ext,
           allResources _
-        )).toList
+        )).toList ++
+        (for {
+          img <- parsed.select("meta[property=og:image]").toList
+          src = new URL(img.attr("content")).getPath.substring(1)
+          List(base, width, height, indicator, ext) <- ResizedImage.unapplySeq(src)
+        } yield new ResizedResource(
+            src,
+            allCatch.opt(width.toInt),
+            allCatch.opt(height.toInt),
+            indicator == "c",
+            base + "." + ext,
+            allResources _
+          )).toList
     } else List.empty
   }
 
