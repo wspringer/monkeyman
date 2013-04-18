@@ -132,7 +132,7 @@ case class MonkeymanConfiguration(sourceDir: File,
   def allResources: List[Resource] = registry.allResources
 
   def resized(resource: Resource) = {
-    val ResizedImage = """^(.*)-([0-9]+|_)x([0-9]+|_)([c]?)\.([a-z]+)$""".r
+    val ResizedImage = """^(.*)-([0-9]+|_)x([0-9]+|_)([!]?)\.([a-z]+)$""".r
     if (resource.contentType == "text/html") {
       val html = IOUtils.toString(resource.open, "UTF-8")
       val parsed = Jsoup.parse(html)
@@ -146,7 +146,7 @@ case class MonkeymanConfiguration(sourceDir: File,
           src,
           allCatch.opt(width.toInt),
           allCatch.opt(height.toInt),
-          indicator == "c",
+          indicator == "!",
           base + "." + ext,
           allResources _
         )).toList ++
@@ -158,7 +158,7 @@ case class MonkeymanConfiguration(sourceDir: File,
             src,
             allCatch.opt(width.toInt),
             allCatch.opt(height.toInt),
-            indicator == "c",
+            indicator == "!",
             base + "." + ext,
             allResources _
           )).toList

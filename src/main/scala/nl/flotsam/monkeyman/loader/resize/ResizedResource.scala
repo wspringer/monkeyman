@@ -31,7 +31,7 @@ import org.imgscalr.Scalr.Mode
 class ResizedResource(val path: String,
                       width: Option[Int],
                       height: Option[Int],
-                      crop: Boolean = false,
+                      cropped: Boolean = false,
                       original: String,
                       allResources: () => List[Resource])
   extends Resource {
@@ -54,7 +54,7 @@ class ResizedResource(val path: String,
    * If only height is defined, then resize height
    * If only width is defined, then resize width
    * If width and height is defined, then fit in the given box, which means comparing aspect ratio of both the
-   * bounding box and the incoming image. If crop is set, then do the opposite.
+   * bounding box and the incoming image. If cropped is set, then do the opposite.
    */
   def open = Closeables.using(resource.open) {
     in =>
@@ -63,7 +63,7 @@ class ResizedResource(val path: String,
         case (Some(w), None) => Scalr.resize(src, Mode.FIT_TO_WIDTH, w, Scalr.OP_ANTIALIAS)
         case (None, Some(h)) => Scalr.resize(src, Mode.FIT_TO_HEIGHT, h, Scalr.OP_ANTIALIAS)
         case (Some(w), Some(h)) =>
-          if (crop) {
+          if (cropped) {
             if (w.toDouble / h.toDouble > src.getWidth.toDouble / src.getHeight.toDouble) {
               val img = Scalr.resize(src, Mode.FIT_TO_WIDTH, w, Scalr.OP_ANTIALIAS)
               img.getSubimage(0, (img.getHeight - h) / 2, w, h)
