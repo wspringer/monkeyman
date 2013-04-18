@@ -60,7 +60,7 @@ Download the monkeyman jar from the Downloads section. Start it with
 
 ## Changes
 
-0.3
+0.3 Gibbon
 
 *Breaking changes:*
 
