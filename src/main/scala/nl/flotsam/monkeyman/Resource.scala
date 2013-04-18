@@ -19,9 +19,10 @@
 
 package nl.flotsam.monkeyman
 
-import java.io.InputStream
+import java.io.{ByteArrayOutputStream, InputStream}
 import org.joda.time.LocalDateTime
-import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.{IOUtils, FilenameUtils}
+import util.Closeables
 
 trait Resource {
 
@@ -76,6 +77,12 @@ trait Resource {
    * Get an HTML fragment to be included somewhere else.
    */
   def asHtmlFragment: Option[String]
+
+  def asString = {
+    val out = new ByteArrayOutputStream()
+    Closeables.using(open)(in => IOUtils.copy(in, out))
+    new String(out.toByteArray, "UTF-8")
+  }
 
   /**
    * The unique identifier of this resource. Doesn't change during its lifetime.

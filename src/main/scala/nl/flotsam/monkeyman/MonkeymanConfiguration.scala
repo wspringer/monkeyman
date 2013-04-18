@@ -27,7 +27,7 @@ import decorator.scalate.ScalateDecorator
 import decorator.snippet.{SnippetDecoration, SnippetDecorator}
 import decorator.yaml.YamlFrontmatterDecorator
 import decorator.zuss.ZussDecorator
-import java.io.{ByteArrayInputStream, File}
+import java.io.{InputStream, OutputStream, ByteArrayInputStream, File}
 import loader.resize.ResizedResource
 import org.apache.commons.io.FilenameUtils._
 import org.fusesource.scalate.{Binding, Template, TemplateEngine}
@@ -39,6 +39,7 @@ import scala.collection.JavaConversions._
 import collection.mutable
 import scala.util.control.Exception.allCatch
 import java.net.URL
+import util.Closeables
 
 case class MonkeymanConfiguration(sourceDir: File,
                                   layoutDir: File,
@@ -194,8 +195,41 @@ case class MonkeymanConfiguration(sourceDir: File,
     } else List.empty
   }
 
+  def transpile(resource: Resource) = {
+    if (resource.path.endsWith(".js.coffee")) {
+      import scala.sys.process._
+      var result: String = ""
+      val coffee = Seq("coffee", "-s", "-p")
+      def feed(out: OutputStream) { Closeables.using(resource.open) {
+        in =>
+          try { IOUtils.copy(in, out) } finally { out.close() }
+      } }
+      def append(in: InputStream) {
+        try { result = IOUtils.toString(in, "UTF-8") } finally { in.close() }
+      }
+      def report(in: InputStream) {
+        try { IOUtils.copy(in, System.err) } finally { in.close() }
+      }
+      coffee run new ProcessIO(feed _, append _, report _)
+      List(new Resource() {
+        def published = resource.published
+        def asHtmlFragment = None
+        def subtitle = resource.subtitle
+        def summary = resource.summary
+        def title = resource.title
+        def pubDateTime = resource.pubDateTime
+        def contentType = "text/javascript"
+        def open = new ByteArrayInputStream(result.getBytes("UTF-8"))
+        def path = FilenameUtils.removeExtension(resource.path)
+        def tags = resource.tags
+        def id = FilenameUtils.removeExtension(resource.path)
+      })
+    } else List.empty
+  }
+
   registry.register(new ResourceGenerator(registry, resized _))
   registry.register(new ResourceGenerator(registry, imagefragment _))
+  registry.register(new ResourceGenerator(registry, transpile _))
 
   private def tryLoadTemplate(dir: File): Template = {
     val files =
