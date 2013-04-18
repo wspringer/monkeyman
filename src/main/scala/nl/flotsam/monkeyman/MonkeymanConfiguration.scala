@@ -198,7 +198,7 @@ case class MonkeymanConfiguration(sourceDir: File,
   def transpile(resource: Resource) = {
     if (resource.path.endsWith(".js.coffee")) {
       import scala.sys.process._
-      var result: String = null
+      var result: String = ""
       val coffee = Seq("coffee", "-s", "-p")
       def feed(out: OutputStream) { Closeables.using(resource.open) {
         in =>
@@ -207,7 +207,10 @@ case class MonkeymanConfiguration(sourceDir: File,
       def append(in: InputStream) {
         try { result = IOUtils.toString(in, "UTF-8") } finally { in.close() }
       }
-      coffee run new ProcessIO(feed _, append _, (_:InputStream).close())
+      def report(in: InputStream) {
+        try { IOUtils.copy(in, System.err) } finally { in.close() }
+      }
+      coffee run new ProcessIO(feed _, append _, report _)
       List(new Resource() {
         def published = resource.published
         def asHtmlFragment = None
