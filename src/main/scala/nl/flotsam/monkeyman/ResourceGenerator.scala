@@ -19,35 +19,36 @@
 
 package nl.flotsam.monkeyman
 
+import collection.mutable.Map
+import util.Logging
 
-object Monkeyman {
+class ResourceGenerator(listener: ResourceListener, fn: (Resource) => List[Resource]) extends ResourceListener with Logging {
 
-  val tools = Map(
-    "generate" -> MonkeymanGenerator,
-    "server" -> MonkeymanServer
-  )
+  private val memory = Map.empty[String, List[Resource]]
 
-  def main(args: Array[String]) {
-    if (args.length == 0) {
-      printUsage
-    } else {
-      tools.get(args(0)) match {
-        case Some(tool) => 
-          tool.main(args.tail)
-        case None => printUsage
-      }
+  def deleted(id: String) {
+    for (resource <- memory.get(id).flatten) {
+      listener.deleted(id)
     }
   }
 
-  def printUsage {
-    println("Usage:")
-    println()
-    for (key <- tools.keys) {
-      println("monkeyman " + key + " ARGS")
+  def modified(resource: Resource) {
+    val resources = fn(resource)
+    for (prev <- memory.get(resource.id).flatten) listener.deleted(prev.id)
+    if (resources.isEmpty) {
+      memory -= resource.id
+    } else {
+      memory += resource.id -> resources
+      for (nxt <- resources) listener.added(resource)
     }
-    println()
-    println("Type 'monkeyman TOOL [-h|--help]' for more information.")
-    println()
+  }
+
+  def added(resource: Resource) {
+    val resources = fn(resource)
+    if (!resources.isEmpty) {
+      memory += resource.id -> resources
+      for (nxt <- resources) listener.added(nxt)
+    }
   }
 
 }

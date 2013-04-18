@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer
+ * Copyright (C) 2013  Wilfred Springer
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -55,6 +55,10 @@ abstract class MonkeymanTool(toolName: String) {
       else new File(name)
   }
 
+  def directoryBrowsing: Boolean = false
+
+  val sections = parser.flag[Boolean]("sections", false, "Interpret markdown horizontal rules as section breaks.")
+
   def main(args: Array[String]) {
     try {
       parser.parse(args)
@@ -63,7 +67,9 @@ abstract class MonkeymanTool(toolName: String) {
       else {
         val config = new MonkeymanConfiguration(
           sourceDir = sourceDir.value.getOrElse(new File(workingDir, "source")),
-          layoutDir = layoutDir.value.getOrElse(new File(workingDir, "layout"))
+          layoutDir = layoutDir.value.getOrElse(new File(workingDir, "layout")),
+          sections = sections.value.getOrElse(false),
+          directoryBrowsing = directoryBrowsing
         )
         try {
           if (!config.sourceDir.exists()) {

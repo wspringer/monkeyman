@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer
+ * Copyright (C) 2013  Wilfred Springer
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
 
 package nl.flotsam.monkeyman
 
-class DecoratingResourceLoader(loader: ResourceLoader, decorators: ResourceDecorator*) extends ResourceLoader {
+class DecoratingResourceLoader(loader: ResourceLoader, decorators: List[ResourceDecorator]) extends ResourceLoader {
 
   def load = loader.load.map(decorate)
   

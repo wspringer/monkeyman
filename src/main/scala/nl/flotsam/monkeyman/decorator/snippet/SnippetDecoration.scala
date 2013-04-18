@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer	
+ * Copyright (C) 2013  Wilfred Springer
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,15 +32,21 @@ class SnippetDecoration(resource: Resource, layoutResolver: LayoutResolver, engi
 
   override def contentType = "text/html"
 
-  override lazy val path = FilenameUtils.removeExtension(resource.path) + ".html"
+  override def path = {
+    if (!FilenameUtils.getExtension(resource.path).isEmpty) FilenameUtils.removeExtension(resource.path) + ".html"
+    else resource.path
+  }
 
   override def open =
     using(resource.open) {
       in =>
         val writer = new StringWriter
         val context = new DefaultRenderContext(path, engine, new PrintWriter(writer))
+        context.attributes("id") = id
         context.attributes("body") = IOUtils.toString(in, "UTF-8")
         context.attributes("title") = title
+        context.attributes("subtitle") = subtitle
+        context.attributes("summary") = summary
         context.attributes("tags") = tags
         context.attributes("pubDateTime") = pubDateTime
         context.attributes("allResources") = allResources()

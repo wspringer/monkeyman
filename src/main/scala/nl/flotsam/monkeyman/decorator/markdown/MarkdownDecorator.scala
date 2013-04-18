@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer
+ * Copyright (C) 2013  Wilfred Springer
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,11 +21,11 @@ package nl.flotsam.monkeyman.decorator.markdown
 
 import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
 
-class MarkdownDecorator extends ResourceDecorator {
+class MarkdownDecorator(sections: Boolean) extends ResourceDecorator {
   
   def decorate(resource: Resource) = {
     if (resource.contentType == "text/x-web-markdown" || resource.path.endsWith(".md"))
-      new MarkdownDecoration(resource)
+      new MarkdownDecoration(resource, sections)
     else resource
   }
   

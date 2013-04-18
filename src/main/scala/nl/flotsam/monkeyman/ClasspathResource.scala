@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer
+ * Copyright (C) 2013  Wilfred Springer
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,20 +27,24 @@ case class ClasspathResource(path: String) extends Resource {
 
   val url = getClass.getResource("/" + path)
 
-  def title = None
+  val title = None
 
-  def pubDateTime = LocalDateTime.now()
+  def subtitle = None
 
-  def contentType = MimeUtil.getMimeTypes(url).asInstanceOf[java.util.Set[MimeType]].head.toString
+  def summary = None
 
-  def open = url.openStream()
+  val pubDateTime = LocalDateTime.now()
+
+  val contentType = MimeUtil.getMimeTypes(url).asInstanceOf[java.util.Set[MimeType]].head.toString
+
+  val open = url.openStream()
 
   def tags = Set.empty
 
-  def published = true
+  val published = true
 
-  def asHtmlFragment = None
+  val asHtmlFragment = None
 
-  def id = path
+  val id = path
 
 }

@@ -17,33 +17,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman.decorator
+package nl.flotsam.monkeyman.decorator.directory
 
-import nl.flotsam.monkeyman.Resource
+import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
 
-class ResourceDecoration(resource: Resource) extends Resource {
+class DirectoryBrowsingDecorator(allResources: () => Seq[Resource]) extends ResourceDecorator {
 
-  def title = resource.title
+  def decorate(resource: Resource) =
+    if (resource.contentType == "application/directory") new DirectoryBrowsingDecoration(resource, allResources)
+    else resource
 
-  def subtitle = resource.subtitle
-
-  def summary = resource.summary
-
-  def pubDateTime = resource.pubDateTime
-
-  def contentType = resource.contentType
-
-  def open = resource.open
-
-  def path = resource.path
-
-  def tags = resource.tags
-
-  def published = resource.published
-
-  def asHtmlFragment = resource.asHtmlFragment
-
-  def id = resource.id
-
-  override def supportsPathRewrite = resource.supportsPathRewrite
 }

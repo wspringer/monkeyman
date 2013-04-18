@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer
+ * Copyright (C) 2013  Wilfred Springer
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -40,7 +40,10 @@ object MonkeymanGenerator extends MonkeymanTool("monkeyman generate") with Loggi
 
   private def generate(config: MonkeymanConfiguration, targetDir: File) {
     targetDir.mkdirs()
-    for (resource <- config.registry.allResources) {
+    for {
+      resource <- config.registry.allResources
+      if resource.contentType != "application/directory"
+    } {
       val targetFile = new File(targetDir, resource.path)
       using(resource.open) {
         info("Generating {}", resource.path)

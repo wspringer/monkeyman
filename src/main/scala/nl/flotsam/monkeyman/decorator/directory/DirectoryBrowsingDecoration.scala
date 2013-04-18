@@ -17,33 +17,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman.decorator
+package nl.flotsam.monkeyman.decorator.directory
 
+import nl.flotsam.monkeyman.decorator.ResourceDecoration
 import nl.flotsam.monkeyman.Resource
+import org.apache.commons.io.FilenameUtils
+import java.io.ByteArrayInputStream
 
-class ResourceDecoration(resource: Resource) extends Resource {
+class DirectoryBrowsingDecoration(resource: Resource, allResources: () => Seq[Resource]) extends ResourceDecoration(resource) {
 
-  def title = resource.title
+  override def contentType = "text/plain"
 
-  def subtitle = resource.subtitle
+  override def title = Some("Index")
 
-  def summary = resource.summary
+  override def open = {
+    val content = (for {
+      res <- allResources()
+      if (res.path != this.path && FilenameUtils.getPathNoEndSeparator(res.path) == resource.path)
+    } yield " * " + FilenameUtils.getName(res.path) + " (" + res.contentType + ")")
+    new ByteArrayInputStream(content.mkString("\n").getBytes("UTF-8"))
+  }
 
-  def pubDateTime = resource.pubDateTime
+  override def supportsPathRewrite = false
 
-  def contentType = resource.contentType
-
-  def open = resource.open
-
-  def path = resource.path
-
-  def tags = resource.tags
-
-  def published = resource.published
-
-  def asHtmlFragment = resource.asHtmlFragment
-
-  def id = resource.id
-
-  override def supportsPathRewrite = resource.supportsPathRewrite
 }

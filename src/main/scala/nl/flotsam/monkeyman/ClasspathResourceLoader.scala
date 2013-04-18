@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer	
+ * Copyright (C) 2013  Wilfred Springer
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,11 +19,6 @@
 
 package nl.flotsam.monkeyman
 
-import org.joda.time.LocalDateTime
-import collection.JavaConversions._
-import eu.medsea.mimeutil.detector.ExtensionMimeDetector
-import eu.medsea.mimeutil.{MimeType, MimeUtil}
-
 
 class ClasspathResourceLoader(paths: Seq[String], loader: ResourceLoader) extends ResourceLoader {
   
@@ -39,8 +34,10 @@ class ClasspathResourceLoader(paths: Seq[String], loader: ResourceLoader) extend
     loader.register(new ResourceListener {
       def deleted(id: String) {
         resources.find(_.id == id) match {
-          case Some(resource) => listener.modified(resource)
-          case None => listener.deleted(id)
+          case Some(resource) =>
+            listener.modified(resource)
+          case None =>
+            listener.deleted(id)
         }
       }
 

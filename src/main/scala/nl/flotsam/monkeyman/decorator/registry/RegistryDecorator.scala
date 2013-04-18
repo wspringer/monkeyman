@@ -1,6 +1,6 @@
 /*
  * Monkeyman static web site generator
- * Copyright (C) 2012  Wilfred Springer
+ * Copyright (C) 2013  Wilfred Springer
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -43,7 +43,7 @@ class RegistryDecorator extends ResourceDecorator with ResourceListener with Log
         resourcesById -= id
         resourceByPath -= resource.path
       case None =>
-        // TODO: Add warning here
+        warn("Entering illegal state: can't find resource with id " + id)
     }
   }
 

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+s3sync.rb -p -r sample/target/ monkeyman.flotsam.nl:
