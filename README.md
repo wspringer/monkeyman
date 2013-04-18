@@ -47,7 +47,7 @@ But basically, it boils down to this:
 * Have a web server pick up all of the changes you are making,
   providing you live preview, by typing `monkeyman server`. 
 * Build your final version in the `target` directory, by typing
-  `middleman generate`. 
+  `monkeyman generate`. 
 
 ## Installation
 
