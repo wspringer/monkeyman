@@ -62,8 +62,18 @@ Download the monkeyman jar from the Downloads section. Start it with
 
 0.3
 
-* 2012-03-13: Genuine YAML support (decent YAML parser used now)
+*Breaking changes:*
+
+* The general pattern now is to move *.html.scaml into *.html files, *.js.coffee files into *.js files, and so on. In line with Middleman's approach.
+
+*Other changes:*
+
+* 2012-03-13: Genuine YAML support (decent YAML parser used now).
 * 2012-03-13: Added summary and subtitle for every resource.
+* 2012-12-21: Add switch to switch directory browsing on/off.
+* 2012-12-21: Fix for allResources not getting updated when new files appear.
+* 2013-04-18: Added coffeescript transpiler support.
+* 2013-04-18: Added image resizing support.
 
 0.2
 
