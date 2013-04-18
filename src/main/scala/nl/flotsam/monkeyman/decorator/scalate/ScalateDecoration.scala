@@ -25,20 +25,22 @@ import org.apache.commons.io.IOUtils
 import nl.flotsam.monkeyman.Resource
 import org.fusesource.scalate.{Template, DefaultRenderContext, TemplateEngine}
 import org.apache.commons.io.FilenameUtils._
+import eu.medsea.mimeutil.MimeUtil
 
 class ScalateDecoration(resource: Resource, template: Template, engine: TemplateEngine, allResources: () => Seq[Resource])
   extends ResourceDecoration(resource)
 {
-  override val path = removeExtension(resource.path) + ".html"
+  override val path = removeExtension(resource.path)
 
-  override def contentType = "text/html"
+  override def contentType = MimeUtil.getMostSpecificMimeType(MimeUtil.getMimeTypes(path)).toString
 
   override def open = {
     val writer = new StringWriter
     val context = new DefaultRenderContext(path, engine, new PrintWriter(writer))
     context.attributes("allResources") = allResources()
-    template.render(context)
-    IOUtils.toInputStream(writer.toString)
+    context.attributes("id") = id
+    engine.layout(template, context)
+    IOUtils.toInputStream(writer.toString, "UTF-8")
   }
 
 }

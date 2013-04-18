@@ -20,43 +20,60 @@ package nl.flotsam.monkeyman
  */
 
 import util.Logging
+import collection.mutable
 
 case class Registry(loader: ResourceLoader)
   extends ResourceListener
   with Logging
 {
 
-  val allResources = loader.load.toList
-  private val resourceById = collection.mutable.Map(allResources.map(resource => resource.id -> resource): _*)
-  val resourceByPath = collection.mutable.Map(allResources.map(resource => resource.path -> resource): _*)
+  private val listeners = mutable.Buffer.empty[ResourceListener]
+
+  private lazy val resources = loader.load.toBuffer
+  def allResources = resources.toList
+  private lazy val resourceById = collection.mutable.Map(resources.map(resource => resource.id -> resource): _*)
+  lazy val resourceByPath = collection.mutable.Map(resources.map(resource => resource.path -> resource): _*)
 
   loader.register(this)
 
+  def register(listener: ResourceListener) {
+    resources.foreach(listener.added)
+    listeners += listener
+  }
+
   def deleted(id: String) {
-    resourceById.get(id) match {
+    val resource = resourceById.get(id)
+    resource match {
       case Some(resource) =>
-        info("Removed {} ({})", resource.id, resource.path)
+        listeners.foreach(_.deleted(resource.id))
+        info("Removed {}", resource.id)
         resourceById -= id
         resourceByPath -= resource.path
+        resources -= resource
       case None =>
-      // TODO: Add warning here
+        info("Failed to find {}", id)
     }
   }
 
   def added(resource: Resource) {
+    listeners.foreach(_.added(resource))
     info("Added {} ({})", resource.id, resource.path)
     resourceById += resource.id -> resource
     resourceByPath += resource.path -> resource
+    resources += resource
   }
 
   def modified(resource: Resource) {
+    listeners.foreach(_.modified(resource))
     info("Modified {} ({})", resource.id, resource.path)
+    resources.find(_.id == resource.id).map(resources -=)
     resourceById.get(resource.id).map(previous => if (previous.path != resource.path) {
       info("Changing path of {} to {}", previous.id, resource.path)
       resourceByPath -= previous.path
     })
     resourceById += resource.id -> resource
     resourceByPath += resource.path -> resource
+    resources += resource
   }
 
 }

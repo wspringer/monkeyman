@@ -19,9 +19,8 @@
 
 package nl.flotsam.monkeyman
 
-import org.apache.commons.io.FileUtils
 import nl.flotsam.monkeyman.ext.ResourceUtils
-import org.apache.commons.io.filefilter._
+import org.apache.commons.io.FileUtils
 import collection.mutable.Buffer
 import name.pachler.nio.file.StandardWatchEventKind._
 import java.io.{FileFilter, File}
@@ -29,7 +28,9 @@ import collection.JavaConversions
 import JavaConversions._
 import util.Logging
 import name.pachler.nio.file._
-import java.util.concurrent.{ExecutorService, Executors}
+import java.util.concurrent.Executors
+import org.apache.commons.io.filefilter._
+import scala.Some
 
 class FileSystemResourceLoader(baseDir: File)
   extends ResourceLoader with Logging {
@@ -63,33 +64,37 @@ class FileSystemResourceLoader(baseDir: File)
         keys.get(watchKey) match {
           case Some(dir) =>
             val events = watchKey.pollEvents().toList
-            watchKey.reset()
             for (event <- events) {
-              if (event.kind() == ENTRY_CREATE) {
+              val kind = event.kind()
+              if (kind == ENTRY_CREATE) {
                 val created = dir.resolve(event.context().asInstanceOf[Path])
                 if ((new File(created.toString)).isDirectory) {
                   debug("Added directory {}", created)
                   keys += created.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY) -> created
+                  listeners.map(_.added(new FileSystemResource(baseDir, relative(created))))
                 } else {
                   debug("Added file {}", created)
                   listeners.map(_.added(new FileSystemResource(baseDir, relative(created))))
                 }
               }
-              else if (event.kind() == ENTRY_DELETE) {
-                val deleted = dir.resolve(event.context().asInstanceOf[Path])
+              else if (kind == ENTRY_DELETE) {
+                val path = event.context().asInstanceOf[Path]
+                val deleted = dir.resolve(path)
                 debug("Deleted {}", deleted)
                 listeners.map(_.deleted(relative(deleted)))
               }
-              else if (event.kind() == ENTRY_MODIFY) {
+              else if (kind == ENTRY_MODIFY) {
                 val modified = dir.resolve(event.context().asInstanceOf[Path])
                 if (!(new File(modified.toString)).isDirectory) {
                   debug("Modified {}", modified)
                   listeners.map(_.modified(new FileSystemResource(baseDir, relative(modified))))
                 }
-              }
+              } else warn("Got unexpected type " + kind)
             }
           case _ =>
+            warn("Illegal state, time to restart")
         }
+        watchKey.reset()
       }
     }
   })
@@ -103,17 +108,21 @@ class FileSystemResourceLoader(baseDir: File)
   }
 
   def load(file: File) = {
-    new FileSystemResource(baseDir, ResourceUtils.getRelativePath(file.getAbsolutePath, baseDir.getAbsolutePath,
-      File.separator))
+    val relative =
+      if (file == baseDir) ""
+      else ResourceUtils.getRelativePath(file.getAbsolutePath, baseDir.getAbsolutePath, File.separator)
+    new FileSystemResource(baseDir, relative)
   }
 
   def load = {
-    FileUtils.listFiles(baseDir,
+    FileUtils.listFilesAndDirs(baseDir,
       new NotFileFilter(
         new OrFileFilter(
           List(
             new PrefixFileFilter(".#"),
-            new SuffixFileFilter("~")
+            new SuffixFileFilter("~"),
+            new PrefixFileFilter("."),
+            new RegexFileFilter("^#[^#]*#$")
           )
         )
       ), TrueFileFilter.INSTANCE).map(load).toSeq

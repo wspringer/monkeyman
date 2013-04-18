@@ -17,16 +17,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman.decorator.markdown
+package nl.flotsam.monkeyman.decorator.directory
 
-import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
+import nl.flotsam.monkeyman.decorator.ResourceDecoration
+import nl.flotsam.monkeyman.Resource
+import org.apache.commons.io.FilenameUtils
+import java.io.ByteArrayInputStream
 
-class MarkdownDecorator(sections: Boolean) extends ResourceDecorator {
-  
-  def decorate(resource: Resource) = {
-    if (resource.contentType == "text/x-web-markdown" || resource.path.endsWith(".md"))
-      new MarkdownDecoration(resource, sections)
-    else resource
+class DirectoryBrowsingDecoration(resource: Resource, allResources: () => Seq[Resource]) extends ResourceDecoration(resource) {
+
+  override def contentType = "text/plain"
+
+  override def title = Some("Index")
+
+  override def open = {
+    val content = (for {
+      res <- allResources()
+      if (res.path != this.path && FilenameUtils.getPathNoEndSeparator(res.path) == resource.path)
+    } yield " * " + FilenameUtils.getName(res.path) + " (" + res.contentType + ")")
+    new ByteArrayInputStream(content.mkString("\n").getBytes("UTF-8"))
   }
-  
+
+  override def supportsPathRewrite = false
+
 }

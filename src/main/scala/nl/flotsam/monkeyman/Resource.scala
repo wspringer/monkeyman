@@ -19,8 +19,10 @@
 
 package nl.flotsam.monkeyman
 
-import java.io.InputStream
+import java.io.{ByteArrayOutputStream, InputStream}
 import org.joda.time.LocalDateTime
+import org.apache.commons.io.{IOUtils, FilenameUtils}
+import util.Closeables
 
 trait Resource {
 
@@ -28,6 +30,16 @@ trait Resource {
    * A human readable String to refer to this file. Can contain spaces.
    */
   def title: Option[String]
+
+  /**
+   * The subtitle of this resource.
+   */
+  def subtitle: Option[String]
+  
+  /**
+   * A summary of this snippet of this resource.
+   */
+  def summary: Option[String]
 
   /**
    * The date from which on this file should be considered published. (Note: that doesn't mean it will stay there
@@ -66,9 +78,35 @@ trait Resource {
    */
   def asHtmlFragment: Option[String]
 
+  def asString = {
+    val out = new ByteArrayOutputStream()
+    Closeables.using(open)(in => IOUtils.copy(in, out))
+    new String(out.toByteArray, "UTF-8")
+  }
+
   /**
    * The unique identifier of this resource. Doesn't change during its lifetime.
    */
   def id: String
+
+  def supportsPathRewrite = false
+
+  /**
+   * The folder in which a resource resides. (The path without the filename.)
+   */
+  lazy val folderName = FilenameUtils.getPath(path)
+
+  lazy val fileName = FilenameUtils.getName(path)
+
+  def baseName = FilenameUtils.getBaseName(path)
+
+  def extension = FilenameUtils.getExtension(path)
+
+  /**
+   * Gets the siblings from a collection of resources.
+   */
+  def siblings(resources: Seq[Resource]) = resources.filter(_.folderName == folderName)
+
+  def generated = false
   
 }

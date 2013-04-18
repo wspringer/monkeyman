@@ -60,6 +60,11 @@ Download the monkeyman jar from the Downloads section. Start it with
 
 ## Changes
 
+0.3
+
+* 2012-03-13: Genuine YAML support (decent YAML parser used now)
+* 2012-03-13: Added summary and subtitle for every resource.
+
 0.2
 
 * 2012-02-20: Default site template (no need to start creating a layout)

@@ -40,7 +40,10 @@ object MonkeymanGenerator extends MonkeymanTool("monkeyman generate") with Loggi
 
   private def generate(config: MonkeymanConfiguration, targetDir: File) {
     targetDir.mkdirs()
-    for (resource <- config.registry.allResources) {
+    for {
+      resource <- config.registry.allResources
+      if resource.contentType != "application/directory"
+    } {
       val targetFile = new File(targetDir, resource.path)
       using(resource.open) {
         info("Generating {}", resource.path)

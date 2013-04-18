@@ -17,16 +17,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package nl.flotsam.monkeyman.decorator.markdown
+package nl.flotsam.monkeyman.decorator.directory
 
 import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
 
-class MarkdownDecorator(sections: Boolean) extends ResourceDecorator {
-  
-  def decorate(resource: Resource) = {
-    if (resource.contentType == "text/x-web-markdown" || resource.path.endsWith(".md"))
-      new MarkdownDecoration(resource, sections)
+class DirectoryBrowsingDecorator(allResources: () => Seq[Resource]) extends ResourceDecorator {
+
+  def decorate(resource: Resource) =
+    if (resource.contentType == "application/directory") new DirectoryBrowsingDecoration(resource, allResources)
     else resource
-  }
-  
+
 }

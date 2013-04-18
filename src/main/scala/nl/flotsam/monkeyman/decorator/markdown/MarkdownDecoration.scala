@@ -23,32 +23,40 @@ import nl.flotsam.monkeyman.Resource
 import nl.flotsam.monkeyman.decorator.ResourceDecoration
 import nl.flotsam.monkeyman.util.Closeables._
 import org.apache.commons.io.{FilenameUtils, IOUtils}
-import org.pegdown.ast.{TextNode, HeaderNode}
+import org.pegdown.ast.{SimpleNode, TextNode, HeaderNode}
 import org.pegdown.{LinkRenderer, ToHtmlSerializer, PegDownProcessor}
+import nl.flotsam.monkeyman.util.Logging
 
-case class MarkdownDecoration(resource: Resource)
-  extends ResourceDecoration(resource) {
+case class MarkdownDecoration(resource: Resource, sections: Boolean)
+  extends ResourceDecoration(resource) with Logging {
 
-  lazy val (extractedTitle, html) = {
-    using(resource.open) {
-      in =>
-        val markdown = IOUtils.toString(in, "UTF-8")
-        val processor = new PegDownProcessor
-        val rootNode = processor.parseMarkdown(markdown.toCharArray)
-        val visitor = new TitleExtractingToHtmlSerializer(new LinkRenderer)
-        val html = visitor.toHtml(rootNode)
-        val title = visitor.title
-        (title, html)
-    }
+  def extractedTitle = extract._1
+
+  def html = extract._2
+
+  def extract = using(resource.open) {
+    in =>
+      val markdown = IOUtils.toString(in, "UTF-8")
+      val processor = new PegDownProcessor
+      val rootNode = processor.parseMarkdown(markdown.toCharArray)
+      val visitor = new TitleExtractingToHtmlSerializer(new LinkRenderer)
+      val html =
+        if (sections) "<section>" + visitor.toHtml(rootNode) + "</section>"
+        else visitor.toHtml(rootNode)
+      val title = visitor.title
+      (title, html)
   }
 
   override def title = resource.title.orElse(extractedTitle)
 
   override val contentType = "text/x-html-fragment"
 
-  override lazy val path = FilenameUtils.removeExtension(resource.path) + ".frag"
+  override def path = {
+    if (!FilenameUtils.getExtension(resource.path).isEmpty) FilenameUtils.removeExtension(resource.path) + ".frag"
+    else resource.path
+  }
 
-  override def open = IOUtils.toInputStream(html)
+  override def open = IOUtils.toInputStream(html, "UTF-8")
 
   override def asHtmlFragment = Some(html)
 
@@ -73,6 +81,16 @@ case class MarkdownDecoration(resource: Resource)
         super.visit(node)
       }
     }
+
+    override def visit(node: SimpleNode) {
+      node.getType match {
+        case SimpleNode.Type.HRule if (sections) =>
+          printer.println.print("</section><section>")
+        case _ => super.visit(node)
+      }
+    }
+
+
   }
 
 }
