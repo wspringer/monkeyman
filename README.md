@@ -49,6 +49,10 @@ But basically, it boils down to this:
 * Build your final version in the `target` directory, by typing
   `monkeyman generate`. 
 
+## Downloads
+
+You can download releases [here](https://github.com/wspringer/monkeyman/wiki/Releases).
+
 ## Installation
 
 Download the monkeyman jar from the Downloads section. Start it with
