@@ -36,15 +36,16 @@ import org.fusesource.scalate.support.URLTemplateSource
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.jsoup.Jsoup
 import scala.collection.JavaConversions._
-import collection.mutable
 import scala.util.control.Exception.allCatch
 import java.net.URL
 import util.Closeables
+import nl.flotsam.monkeyman.decorator.suffix.OmitSuffixDecorator
 
 case class MonkeymanConfiguration(sourceDir: File,
                                   layoutDir: File,
                                   sections: Boolean = false,
-                                  directoryBrowsing: Boolean = false) {
+                                  directoryBrowsing: Boolean = false,
+                                  omitHtmlSuffix: Boolean = false) {
 
   private val layoutFileName = "layout"
 
@@ -124,6 +125,7 @@ case class MonkeymanConfiguration(sourceDir: File,
           Some(new MarkdownDecorator(sections)),
           Some(new SnippetDecorator(layoutResolver, templateEngine, allResources _)),
           Some(new ScalateDecorator(templateEngine, allResources _)),
+          if (omitHtmlSuffix) Some(new OmitSuffixDecorator) else None,
           Some(PermalinkDecorator)
         ).flatten
       )

@@ -34,15 +34,10 @@ abstract class MonkeymanTool(toolName: String) {
 
   val help = parser.flag(List("h", "help"), "Print usage information.")
 
+  val omitHtmlSuffix = parser.flag(List("omit-html-suffix"), "Omit HTML suffix.")
+
   val sourceDir = parser.option[File](List("i", "in"), "DIR",
     "The directory to scan for content. (Defaults to 'source' directory.)") {
-    (name, opt) =>
-      if (name.startsWith("~")) new File(System.getProperty("user.home") + name.substring(1))
-      else new File(name)
-  }
-
-  val targetDir = parser.option[File](List("o", "out"), "DIR",
-    "The directory for storing the generated pages. (Defaults to 'target' directory.") {
     (name, opt) =>
       if (name.startsWith("~")) new File(System.getProperty("user.home") + name.substring(1))
       else new File(name)
@@ -65,11 +60,13 @@ abstract class MonkeymanTool(toolName: String) {
       if (help.value == Some(true))
         println(parser.usageString(None))
       else {
+        println("Omit " + omitHtmlSuffix.value)
         val config = new MonkeymanConfiguration(
           sourceDir = sourceDir.value.getOrElse(new File(workingDir, "source")),
           layoutDir = layoutDir.value.getOrElse(new File(workingDir, "layout")),
           sections = sections.value.getOrElse(false),
-          directoryBrowsing = directoryBrowsing
+          directoryBrowsing = directoryBrowsing,
+          omitHtmlSuffix = omitHtmlSuffix.value == Some(true)
         )
         try {
           if (!config.sourceDir.exists()) {

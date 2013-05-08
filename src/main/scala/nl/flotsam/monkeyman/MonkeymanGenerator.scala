@@ -20,14 +20,26 @@
 package nl.flotsam.monkeyman
 
 import java.io.File
-import util.{Closeables, Logging}
-import Closeables._
-import org.apache.commons.io.FileUtils
+import util.Logging
 import org.clapper.argot.ArgotConverters._
+import nl.flotsam.monkeyman.sink.FileSystemSink
 
 object MonkeymanGenerator extends MonkeymanTool("monkeyman generate") with Logging {
 
   private val list = parser.flag("l", true, "Only list the pages found.")
+
+  private val sinkFactories: List[SinkFactory] = List(FileSystemSink)
+
+  private def createSink(location: String): Option[Sink] =
+    sinkFactories.view.map(_.create(location)).flatten.headOption
+
+
+  val targetLocation = parser.option[String](List("o", "out"), "LOCATION",
+    "The location where generated content will be stored. (Defaults to 'target' directory.") {
+    (name, opt) =>
+      if (name.startsWith("~")) new File(System.getProperty("user.home") + name.substring(1)).getAbsolutePath
+      else new File(name).getAbsolutePath
+  }
 
   def execute(config: MonkeymanConfiguration) {
     if (list.value == Some(true))
@@ -35,20 +47,19 @@ object MonkeymanGenerator extends MonkeymanTool("monkeyman generate") with Loggi
         resource =>
           resource.contentType + " " + resource.path
       }.mkString("\n"))
-    else generate(config, targetDir.value.getOrElse(new File(workingDir, "target")))
+    else generate(config, targetLocation.value.getOrElse(new File(workingDir, "target").getAbsolutePath))
   }
 
-  private def generate(config: MonkeymanConfiguration, targetDir: File) {
-    targetDir.mkdirs()
-    for {
-      resource <- config.registry.allResources
-      if resource.contentType != "application/directory"
-    } {
-      val targetFile = new File(targetDir, resource.path)
-      using(resource.open) {
-        info("Generating {}", resource.path)
-        FileUtils.copyInputStreamToFile(_, targetFile)
-      }
+  private def generate(config: MonkeymanConfiguration, location: String) {
+    createSink(location) match {
+      case Some(sink) =>
+        for {
+          resource <- config.registry.allResources
+          if resource.contentType != "application/directory"
+        } sink.receive(resource)
+      case None =>
+        System.err.println("'%s' is not a valid location".format(location))
+        System.exit(1)
     }
   }
 
