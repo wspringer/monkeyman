@@ -22,24 +22,19 @@ package nl.flotsam.monkeyman
 import java.io.File
 import util.Logging
 import org.clapper.argot.ArgotConverters._
-import nl.flotsam.monkeyman.sink.FileSystemSink
+import nl.flotsam.monkeyman.sink.{S3Sink, FileSystemSink}
 
 object MonkeymanGenerator extends MonkeymanTool("monkeyman generate") with Logging {
 
   private val list = parser.flag("l", true, "Only list the pages found.")
 
-  private val sinkFactories: List[SinkFactory] = List(FileSystemSink)
+  private val sinkFactories: List[SinkFactory] = List(S3Sink, FileSystemSink)
 
   private def createSink(location: String): Option[Sink] =
     sinkFactories.view.map(_.create(location)).flatten.headOption
 
-
   val targetLocation = parser.option[String](List("o", "out"), "LOCATION",
-    "The location where generated content will be stored. (Defaults to 'target' directory.") {
-    (name, opt) =>
-      if (name.startsWith("~")) new File(System.getProperty("user.home") + name.substring(1)).getAbsolutePath
-      else new File(name).getAbsolutePath
-  }
+    "The location where generated content will be stored. (Defaults to 'target' directory.")
 
   def execute(config: MonkeymanConfiguration) {
     if (list.value == Some(true))

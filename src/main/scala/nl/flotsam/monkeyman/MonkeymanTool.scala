@@ -60,7 +60,6 @@ abstract class MonkeymanTool(toolName: String) {
       if (help.value == Some(true))
         println(parser.usageString(None))
       else {
-        println("Omit " + omitHtmlSuffix.value)
         val config = new MonkeymanConfiguration(
           sourceDir = sourceDir.value.getOrElse(new File(workingDir, "source")),
           layoutDir = layoutDir.value.getOrElse(new File(workingDir, "layout")),

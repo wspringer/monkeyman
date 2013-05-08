@@ -8,6 +8,9 @@ import org.apache.commons.io.FileUtils
 import nl.flotsam.monkeyman.util.Logging
 
 class FileSystemSink(directory: File) extends Sink with Logging {
+
+  directory.mkdirs()
+
   def receive(resource: Resource) {
     val targetFile = new File(directory, resource.path)
     using(resource.open) {
@@ -21,8 +24,9 @@ object FileSystemSink extends SinkFactory {
 
   def create(location: String) =
     allCatch.opt {
-      val directory = new File(location)
-      directory.mkdirs()
+      val directory =
+        if (location.startsWith("~")) new File(System.getProperty("user.home") + location.substring(1))
+        else new File(location)
       new FileSystemSink(directory)
     }
 
