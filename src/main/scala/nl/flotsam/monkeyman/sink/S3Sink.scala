@@ -9,7 +9,7 @@ import nl.flotsam.monkeyman.util.Closeables._
 import java.io.File
 import org.apache.commons.io.FileUtils
 import nl.flotsam.monkeyman.util.Logging
-import org.jets3t.service.acl.{AccessControlList, Permission, GroupGrantee}
+import org.jets3t.service.acl.{Permission, GroupGrantee}
 
 class S3Sink(service: S3Service, bucket: S3Bucket) extends Sink with Logging {
 
