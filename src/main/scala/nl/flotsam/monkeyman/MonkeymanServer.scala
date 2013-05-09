@@ -71,9 +71,10 @@ object MonkeymanServer extends MonkeymanTool("monkeyman server") with Logging {
         val lookup = path.substring(1)
         config.registry.resourceByPath.get(lookup) match {
           case Some(resource) if resource.contentType == "application/directory" =>
+            val suffix = if (config.omitHtmlSuffix) "" else ".html"
             val altPath =
-              if (resource.path == "") "index.html"
-              else resource.path + "/index.html"
+              if (resource.path == "") "index" + suffix
+              else resource.path + "/index" + suffix
             config.registry.resourceByPath.get(altPath) match {
               case Some(altResource) =>
                 info("Sending index.html")

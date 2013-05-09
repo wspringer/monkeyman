@@ -20,7 +20,8 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.0.0",
   "com.asual.lesscss" % "lesscss-engine" % "1.1.5",
   "org.yaml" % "snakeyaml" % "1.10",
-  "org.jsoup" % "jsoup" % "1.6.3"
+  "org.jsoup" % "jsoup" % "1.6.3",
+  "net.java.dev.jets3t" % "jets3t" % "0.9.0"
 //  "org.imgscalr" % "imgscalr-lib" % "4.2"
 )
 

@@ -31,9 +31,14 @@ case class PermalinkDecoration(resource: Resource) extends ResourceDecoration(re
     if (resource.supportsPathRewrite)
       resource.title.map {
         str =>
-          getPath(resource.path) +
-            permalinkName(getBaseName(str), 60) +
-            "." + getExtension(resource.path)
+          getExtension(resource.path) match {
+            case "" =>
+              getPath(resource.path) +
+                permalinkName(getBaseName(str), 60)
+            case ext =>
+              getPath(resource.path) +
+                permalinkName(getBaseName(str), 60) + "." + ext
+          }
       }.getOrElse(resource.path)
     else resource.path
 
