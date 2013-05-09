@@ -38,7 +38,7 @@ object MonkeymanGenerator extends MonkeymanTool("monkeyman generate") with Loggi
 
   def execute(config: MonkeymanConfiguration) {
     if (list.value == Some(true))
-      println(config.registry.allResources.map {
+      println(config.registry.allResources.par.map {
         resource =>
           resource.contentType + " " + resource.path
       }.mkString("\n"))

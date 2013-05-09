@@ -45,7 +45,7 @@ case class MonkeymanConfiguration(sourceDir: File,
                                   layoutDir: File,
                                   sections: Boolean = false,
                                   directoryBrowsing: Boolean = false,
-                                  omitHtmlSuffix: Boolean = false) {
+                                  val omitHtmlSuffix: Boolean = false) {
 
   private val layoutFileName = "layout"
 
@@ -109,6 +109,10 @@ case class MonkeymanConfiguration(sourceDir: File,
     name = "id",
     className = "String",
     defaultValue = None
+  ) :: new Binding(
+    name = "omitHtmlSuffix",
+    className = "Boolean",
+    defaultValue = Some(omitHtmlSuffix.toString)
   ) :: templateEngine.bindings
 
 
