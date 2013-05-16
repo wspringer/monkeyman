@@ -20,11 +20,12 @@
 package nl.flotsam.monkeyman.decorator.directory
 
 import nl.flotsam.monkeyman.{Resource, ResourceDecorator}
+import org.fusesource.scalate.TemplateEngine
 
-class DirectoryBrowsingDecorator(allResources: () => Seq[Resource]) extends ResourceDecorator {
+class DirectoryBrowsingDecorator(allResources: () => Seq[Resource], templateEngine: TemplateEngine) extends ResourceDecorator {
 
   def decorate(resource: Resource) =
-    if (resource.contentType == "application/directory") new DirectoryBrowsingDecoration(resource, allResources)
+    if (resource.contentType == "application/directory") new DirectoryBrowsingDecoration(resource, allResources, templateEngine)
     else resource
 
 }
