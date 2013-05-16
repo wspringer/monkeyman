@@ -21,21 +21,28 @@ package nl.flotsam.monkeyman.decorator.directory
 
 import nl.flotsam.monkeyman.decorator.ResourceDecoration
 import nl.flotsam.monkeyman.Resource
-import org.apache.commons.io.FilenameUtils
-import java.io.ByteArrayInputStream
+import org.apache.commons.io.{IOUtils, FilenameUtils}
+import java.io.{PrintWriter, StringWriter, ByteArrayInputStream}
+import org.fusesource.scalate.{DefaultRenderContext, TemplateEngine}
 
-class DirectoryBrowsingDecoration(resource: Resource, allResources: () => Seq[Resource]) extends ResourceDecoration(resource) {
+class DirectoryBrowsingDecoration(resource: Resource, allResources: () => Seq[Resource], engine: TemplateEngine)
+  extends ResourceDecoration(resource)
+{
 
-  override def contentType = "text/plain"
+  override def contentType = "text/html"
 
   override def title = Some("Index")
 
   override def open = {
-    val content = (for {
-      res <- allResources()
-      if (res.path != this.path && FilenameUtils.getPathNoEndSeparator(res.path) == resource.path)
-    } yield " * " + FilenameUtils.getName(res.path) + " (" + res.contentType + ")")
-    new ByteArrayInputStream(content.mkString("\n").getBytes("UTF-8"))
+    val result = engine.layout("__default_index.scaml", Map(
+      "resources" -> (for {
+        res <- allResources()
+        if (res.path != this.path && FilenameUtils.getPathNoEndSeparator(res.path) == resource.path)
+      } yield res).toList,
+      "allResources" -> allResources(),
+      "id" -> id
+    ))
+    IOUtils.toInputStream(result, "UTF-8")
   }
 
   override def supportsPathRewrite = false

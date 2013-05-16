@@ -58,6 +58,7 @@ case class MonkeymanConfiguration(sourceDir: File,
   templateEngine.resourceLoader = new ScalateResourceLoader() {
     def resource(uri: String) =
       if (uri == "__default.scaml") Some(new URLTemplateSource(getClass.getResource("/layout.scaml")))
+      else if (uri == "__default_index.scaml") Some(new URLTemplateSource(getClass.getResource("/index.scaml")))
       else defaultLoader.resource(uri)
   }
 
@@ -122,7 +123,7 @@ case class MonkeymanConfiguration(sourceDir: File,
         new ClasspathResourceLoader(Seq("favicon.ico", "monkeyman/logo.png", "monkeyman/monkeyman.less"),
           fileSystemResourceLoader),
         List(
-          if (directoryBrowsing) Some(new DirectoryBrowsingDecorator(allResources _)) else None,
+          if (directoryBrowsing) Some(new DirectoryBrowsingDecorator(allResources _, templateEngine)) else None,
           Some(new LessDecorator),
           Some(new ZussDecorator),
           Some(new YamlFrontmatterDecorator()),

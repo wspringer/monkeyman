@@ -1,0 +1,10 @@
+-@ val resources: List[nl.flotsam.monkeyman.Resource]
+!!! 5
+%html
+  %body
+    %h1 Index
+    %ul
+      - for (resource <- resources)
+        %li
+          %a(href={"./" + resource.fileName}) #{resource.fileName} (#{resource.contentType})
+
