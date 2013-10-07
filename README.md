@@ -60,6 +60,10 @@ Download the monkeyman jar from the Downloads section. Start it with
 
 ## Changes
 
+0.4 Brazza (Not released)
+
+* 2013-10-07: Default .mf mapping to text/cache-manifest
+
 0.3 Gibbon
 
 *Breaking changes:*
