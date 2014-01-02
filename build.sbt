@@ -21,7 +21,6 @@ libraryDependencies ++= Seq(
   "com.asual.lesscss" % "lesscss-engine" % "1.1.5",
   "org.yaml" % "snakeyaml" % "1.10",
   "org.jsoup" % "jsoup" % "1.6.3"
-//  "org.imgscalr" % "imgscalr-lib" % "4.2"
 )
 
 resolvers ++= Seq(
@@ -36,10 +35,6 @@ initialCommands in console := "import java.io._; import nl.flotsam.monkeyman._"
 mainClass in (Compile, run) := Some("nl.flotsam.monkeyman.Monkeyman")
 
 mainClass in (Compile, packageBin) := Some("nl.flotsam.monkeyman.Monkeyman")
-
-//seq(ProguardPlugin.proguardSettings :_*)
-//
-//proguardOptions ++= List(keepMain("nl.flotsam.monkeyman.Monkeyman"), "-keepclasseswithmembers class org.pegdown.**", "-keepclasseswithmembers class org.parboiled.**")
 
 seq(assemblySettings: _*)
 
