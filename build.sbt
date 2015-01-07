@@ -1,6 +1,6 @@
 name := "monkeyman"
 
-version := "0.3"
+version := "0.3.1"
 
 scalaVersion := "2.9.2"
 
