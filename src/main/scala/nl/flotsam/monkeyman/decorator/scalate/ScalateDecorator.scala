@@ -31,7 +31,7 @@ class ScalateDecorator(engine: TemplateEngine, allResources: () => Seq[Resource]
     case res @ FileSystemResource(_, _) if TemplateEngine.templateTypes.contains(FilenameUtils.getExtension(res.path)) =>
       val source = new FileTemplateSource(res.file, resource.path)
       try {
-        new ScalateDecoration(resource, engine.load(source), engine, allResources)
+        new ScalateDecoration(resource, engine.load(source, Traversable.empty), engine, allResources)
       } catch {
         case t: Throwable =>
           System.err.println(t.getMessage)

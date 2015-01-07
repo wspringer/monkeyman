@@ -52,7 +52,7 @@ case class MonkeymanConfiguration(sourceDir: File,
   private val sourceDirectories = List(layoutDir, sourceDir)
 
   private val templateEngine =
-    new TemplateEngine(sourceDirectories)
+    new TemplateEngine(sourceDirectories, mode = "production")
 
   private val defaultLoader = templateEngine.resourceLoader
   templateEngine.resourceLoader = new ScalateResourceLoader() {
