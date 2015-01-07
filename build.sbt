@@ -1,5 +1,3 @@
-import AssemblyKeys._
-
 name := "monkeyman"
 
 version := "0.3"
@@ -37,12 +35,6 @@ initialCommands in console := "import java.io._; import nl.flotsam.monkeyman._"
 mainClass in (Compile, run) := Some("nl.flotsam.monkeyman.Monkeyman")
 
 mainClass in (Compile, packageBin) := Some("nl.flotsam.monkeyman.Monkeyman")
-
-//seq(ProguardPlugin.proguardSettings :_*)
-//
-//proguardOptions ++= List(keepMain("nl.flotsam.monkeyman.Monkeyman"), "-keepclasseswithmembers class org.pegdown.**", "-keepclasseswithmembers class org.parboiled.**")
-
-seq(assemblySettings: _*)
 
 mainClass in assembly := Some("nl.flotsam.monkeyman.Monkeyman")
 
