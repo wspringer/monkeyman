@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# This very simple script uses the dependencies fetched by sbt to
+# build up the classpath. You first must build the project with 'sbt
+# compile'. You can use the command 'sbt get-jars' (defined in
+# project/Build.sbt) to find the complete classpath. Then replace all
+# references to your home directory's .ivy2 directory with $IVY2_DIR,
+# and references to your own workspace with $MONKEYMAN_DIR
+#
+# Then add $MONKEYMAN_DIR/bin to your PATH
+
+# The subcommands are: `monkeyman generate` and `monkeyman server`
+# Add -h for details for each command, i.e. monkeyman generate -h
+
+
+export MONKEYMAN_DIR=$HOME/workspace/monkeyman
+export IVY2_DIR=$HOME/.ivy2/cache
+
+export MONKEYMAN_CLASSPATH=$MONKEYMAN_DIR/target/scala-2.9.2/classes:$MONKEYMAN_DIR/lib/jpathwatch-0-95-2.jar:$MONKEYMAN_DIR/lib/zuss.jar:$IVY2_DIR/org.pegdown/pegdown/jars/pegdown-1.1.0.jar:$IVY2_DIR/org.parboiled/parboiled-core/jars/parboiled-core-1.0.2.jar:$IVY2_DIR/org.parboiled/parboiled-java/jars/parboiled-java-1.0.2.jar:$IVY2_DIR/asm/asm/jars/asm-3.3.1.jar:$IVY2_DIR/asm/asm-util/jars/asm-util-3.3.1.jar:$IVY2_DIR/asm/asm-tree/jars/asm-tree-3.3.1.jar:$IVY2_DIR/asm/asm-analysis/jars/asm-analysis-3.3.1.jar:$IVY2_DIR/org.fusesource.scalamd/scalamd/bundles/scalamd-1.5.jar:$IVY2_DIR/joda-time/joda-time/jars/joda-time-2.0.jar:$IVY2_DIR/eu.medsea.mimeutil/mime-util/bundles/mime-util-2.1.3.jar:$IVY2_DIR/commons-io/commons-io/jars/commons-io-2.1.jar:$IVY2_DIR/org.joda/joda-convert/jars/joda-convert-1.2.jar:$IVY2_DIR/org.fusesource.scalate/scalate-core/bundles/scalate-core-1.5.3.jar:$IVY2_DIR/org.fusesource.scalate/scalate-util/bundles/scalate-util-1.5.3.jar:$IVY2_DIR/org.clapper/argot_2.9.2/jars/argot_2.9.2-0.4.jar:$IVY2_DIR/org.clapper/grizzled-scala_2.9.2/jars/grizzled-scala_2.9.2-1.0.13.jar:$IVY2_DIR/jline/jline/jars/jline-2.6.jar:$IVY2_DIR/com.ibm.icu/icu4j/jars/icu4j-4.8.1.1.jar:$IVY2_DIR/ch.qos.logback/logback-core/jars/logback-core-1.0.0.jar:$IVY2_DIR/ch.qos.logback/logback-classic/jars/logback-classic-1.0.0.jar:$IVY2_DIR/org.slf4j/slf4j-api/jars/slf4j-api-1.6.4.jar:$IVY2_DIR/com.asual.lesscss/lesscss-engine/jars/lesscss-engine-1.1.5.jar:$IVY2_DIR/org.mozilla/rhino/jars/rhino-1.7R3.jar:$IVY2_DIR/commons-logging/commons-logging/jars/commons-logging-1.1.1.jar
+
+scala -classpath $MONKEYMAN_CLASSPATH nl.flotsam.monkeyman.Monkeyman "$@"

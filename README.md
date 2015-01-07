@@ -63,6 +63,7 @@ Download the monkeyman jar from the Downloads section. Start it with
 0.4 Brazza (Not released)
 
 * 2013-10-07: Default .mf mapping to text/cache-manifest
+* 2014-01-07: Upgrade to Scala 2.10.4.
 
 0.3 Gibbon
 
