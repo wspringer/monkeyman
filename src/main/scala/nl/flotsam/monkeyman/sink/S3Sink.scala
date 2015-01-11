@@ -19,21 +19,26 @@
 
 package nl.flotsam.monkeyman.sink
 
-import nl.flotsam.monkeyman.{SinkFactory, Resource, Sink}
-import org.jets3t.service.security.AWSCredentials
-import org.jets3t.service.impl.rest.httpclient.RestS3Service
-import org.jets3t.service.model.{S3Object, S3Bucket}
-import org.jets3t.service.S3Service
-import nl.flotsam.monkeyman.util.Closeables._
 import java.io.File
-import org.apache.commons.io.FileUtils
+
+import com.google.common.hash._
+import com.google.common.io._
+import nl.flotsam.monkeyman.util.Closeables._
 import nl.flotsam.monkeyman.util.Logging
-import org.jets3t.service.acl.{Permission, GroupGrantee}
+import nl.flotsam.monkeyman.{Resource, Sink, SinkFactory}
+import org.apache.commons.io.FileUtils
+import org.jets3t.service.S3Service
+import org.jets3t.service.acl.{GroupGrantee, Permission}
+import org.jets3t.service.impl.rest.httpclient.RestS3Service
+import org.jets3t.service.model.{S3Bucket, S3Object}
+import org.jets3t.service.security.AWSCredentials
 
 class S3Sink(service: S3Service, bucket: S3Bucket) extends Sink with Logging {
 
   private val acl = service.getBucketAcl(bucket)
   acl.grantPermission(GroupGrantee.ALL_USERS, Permission.PERMISSION_READ)
+
+  val previous = service.listObjects(bucket).map(obj => obj.getName -> obj.getETag).toMap
 
   def receive(resource: Resource) {
     using (resource.open) {
@@ -41,13 +46,16 @@ class S3Sink(service: S3Service, bucket: S3Bucket) extends Sink with Logging {
         val tmpFile = File.createTempFile("monkeyman", "tmp")
         try {
           FileUtils.copyInputStreamToFile(resource.open, tmpFile)
-          val obj = new S3Object(resource.path)
-          obj.setContentType(resource.contentType)
-          obj.setDataInputFile(tmpFile)
-          obj.setContentLength(FileUtils.sizeOf(tmpFile))
-          obj.setAcl(acl)
-          info("Generating {}", resource.path)
-          service.putObject(bucket, obj)
+          val generated = Files.hash(tmpFile, Hashing.md5())
+          if (Some(generated) == previous.get(resource.path)) {
+            val obj = new S3Object(resource.path)
+            obj.setContentType(resource.contentType)
+            obj.setDataInputFile(tmpFile)
+            obj.setContentLength(FileUtils.sizeOf(tmpFile))
+            obj.setAcl(acl)
+            info(s"Generating ${resource.path}")
+            service.putObject(bucket, obj)
+          }
         } finally {
           tmpFile.delete()
         }
