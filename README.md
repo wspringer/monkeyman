@@ -64,7 +64,8 @@ Download the monkeyman jar from the Downloads section. Start it with
 
 * 2013-10-07: Default .mf mapping to text/cache-manifest
 * 2014-01-07: Upgrade to Scala 2.10.4.
-* : Upload only files that have been changed, when uploading to S3.
+* 2014-01-11: Upload only files that have been changed, when uploading to S3.
+* 2014-01-12: Fenced code blocks.
 
 0.3 Gibbon
 
