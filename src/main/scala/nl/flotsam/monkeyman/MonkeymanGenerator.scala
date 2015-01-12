@@ -22,13 +22,15 @@ package nl.flotsam.monkeyman
 import java.io.File
 import util.Logging
 import org.clapper.argot.ArgotConverters._
-import nl.flotsam.monkeyman.sink.{S3Sink, FileSystemSink}
+import nl.flotsam.monkeyman.sink.{S3SinkFactory, FileSystemSink}
 
 object MonkeymanGenerator extends MonkeymanTool("monkeyman generate") with Logging {
 
   private val list = parser.flag("l", true, "Only list the pages found.")
 
-  private val sinkFactories: List[SinkFactory] = List(S3Sink, FileSystemSink)
+  private val force = parser.flag("f", true, "Force files to be overwritten.")
+
+  private val sinkFactories: List[SinkFactory] = List(new S3SinkFactory(force.value.getOrElse(false)), FileSystemSink)
 
   private def createSink(location: String): Option[Sink] =
     sinkFactories.view.map(_.create(location)).flatten.headOption

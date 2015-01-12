@@ -33,7 +33,7 @@ import org.jets3t.service.impl.rest.httpclient.RestS3Service
 import org.jets3t.service.model.{S3Bucket, S3Object}
 import org.jets3t.service.security.AWSCredentials
 
-class S3Sink(service: S3Service, bucket: S3Bucket) extends Sink with Logging {
+class S3Sink(service: S3Service, bucket: S3Bucket, force: Boolean) extends Sink with Logging {
 
   private val acl = service.getBucketAcl(bucket)
   acl.grantPermission(GroupGrantee.ALL_USERS, Permission.PERMISSION_READ)
@@ -47,7 +47,7 @@ class S3Sink(service: S3Service, bucket: S3Bucket) extends Sink with Logging {
         try {
           FileUtils.copyInputStreamToFile(resource.open, tmpFile)
           val generated = Files.hash(tmpFile, Hashing.md5())
-          if (Some(generated) == previous.get(resource.path)) {
+          if (force || (Some(generated.toString) != previous.get(resource.path))) {
             val obj = new S3Object(resource.path)
             obj.setContentType(resource.contentType)
             obj.setDataInputFile(tmpFile)
@@ -64,7 +64,7 @@ class S3Sink(service: S3Service, bucket: S3Bucket) extends Sink with Logging {
 
 }
 
-object S3Sink extends SinkFactory {
+class S3SinkFactory(force: Boolean) extends SinkFactory {
 
   private val UriPattern = "s3:([^:]+):([^:]+):(.*)".r
 
@@ -74,7 +74,7 @@ object S3Sink extends SinkFactory {
         val credentials = new AWSCredentials(accessKey, secretKey)
         val service = new RestS3Service(credentials)
         val bucket = service.getOrCreateBucket(bucketName, S3Bucket.LOCATION_US_STANDARD)
-        Some(new S3Sink(service, bucket))
+        Some(new S3Sink(service, bucket, force))
       case _ =>
         None
     }
