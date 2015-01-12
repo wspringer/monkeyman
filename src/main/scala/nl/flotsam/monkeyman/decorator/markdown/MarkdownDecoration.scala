@@ -24,7 +24,7 @@ import nl.flotsam.monkeyman.decorator.ResourceDecoration
 import nl.flotsam.monkeyman.util.Closeables._
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.pegdown.ast.{SimpleNode, TextNode, HeaderNode}
-import org.pegdown.{LinkRenderer, ToHtmlSerializer, PegDownProcessor}
+import org.pegdown.{Extensions, LinkRenderer, ToHtmlSerializer, PegDownProcessor}
 import nl.flotsam.monkeyman.util.Logging
 
 case class MarkdownDecoration(resource: Resource, sections: Boolean)
@@ -37,7 +37,7 @@ case class MarkdownDecoration(resource: Resource, sections: Boolean)
   def extract = using(resource.open) {
     in =>
       val markdown = IOUtils.toString(in, "UTF-8")
-      val processor = new PegDownProcessor
+      val processor = new PegDownProcessor(Extensions.FENCED_CODE_BLOCKS)
       val rootNode = processor.parseMarkdown(markdown.toCharArray)
       val visitor = new TitleExtractingToHtmlSerializer(new LinkRenderer)
       val html =

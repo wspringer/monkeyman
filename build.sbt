@@ -6,7 +6,7 @@ scalaVersion := "2.10.4"
 
 libraryDependencies ++= Seq(
   "com.google.guava" % "guava" % "18.0",
-  "org.pegdown" % "pegdown" % "1.1.0",
+  "org.pegdown" % "pegdown" % "1.4.2",
   "org.fusesource.scalamd" % "scalamd" % "1.5",
   "joda-time" % "joda-time" % "2.0",
   "commons-io" % "commons-io" % "2.4",
